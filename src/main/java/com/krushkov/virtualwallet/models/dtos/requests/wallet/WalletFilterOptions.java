@@ -1,6 +1,6 @@
-package com.krushkov.virtualwallet.models.dtos.filters;
+package com.krushkov.virtualwallet.models.dtos.requests.wallet;
 
-import com.krushkov.virtualwallet.models.enums.CurrencyCode;
+import com.krushkov.virtualwallet.helpers.ValidationMessages;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -9,18 +9,18 @@ import java.math.BigDecimal;
 
 public record WalletFilterOptions(
 
-        @Positive(message = "User Id must be positive")
+        @Positive(message = ValidationMessages.WALLET_USER_ID_LENGTH_ERROR)
         Long userId,
 
-        CurrencyCode currencyCode,
+        String currencyCode,
 
-        @PositiveOrZero(message = "Minimal balance must be positive or zero.")
+        @PositiveOrZero(message = ValidationMessages.WALLET_MIN_BALANCE_LENGTH_ERROR)
         BigDecimal minBalance,
 
-        @PositiveOrZero(message = "Maximal balance must be positive or zero.")
+        @PositiveOrZero(message = ValidationMessages.WALLET_MAX_BALANCE_LENGTH_ERROR)
         BigDecimal maxBalance
 ) {
-    @AssertTrue(message = "Min balance must be less than or equal to max balance.")
+    @AssertTrue(message = ValidationMessages.WALLET_BALANCE_RANGE_ERROR)
     public boolean isValidBalanceRange() {
         if (minBalance == null || maxBalance == null) {
             return true;

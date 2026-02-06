@@ -41,15 +41,7 @@ public class Transaction {
     @JoinColumn(name = "currency_code", nullable = false)
     private Currency currency;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "sender_wallet_id")
-    private Wallet senderWallet;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipient_wallet_id")
-    private Wallet recipientWallet;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender_id")
     private User sender;
 
@@ -57,31 +49,22 @@ public class Transaction {
     @JoinColumn(name = "recipient_id")
     private User recipient;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_wallet_id")
+    private Wallet senderWallet;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipient_wallet_id")
+    private Wallet recipientWallet;
+
     @Column(name = "external_reference", unique = true)
     private String externalReference;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
     @PrePersist
     public void onCreate() {
         createdAt = LocalDateTime.now();
-        updatedAt = createdAt;
-    }
-
-    @PreUpdate
-    public void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-
-    public void confirm() {
-        status = TransactionStatus.CONFIRMED;
-    }
-
-    public void fail() {
-        status = TransactionStatus.FAILED;
     }
 }

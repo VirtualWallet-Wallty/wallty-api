@@ -15,15 +15,22 @@ CREATE TABLE users
     user_id       BIGINT       NOT NULL UNIQUE PRIMARY KEY AUTO_INCREMENT,
     username      VARCHAR(50)  NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
+
     first_name    VARCHAR(50)  NOT NULL,
     last_name     VARCHAR(50)  NOT NULL,
+
     email         VARCHAR(255) NOT NULL UNIQUE,
     phone_number  VARCHAR(10)  NULL UNIQUE,
     photo_url     VARCHAR(512) NULL,
+
     role_id       BIGINT       NOT NULL,
+
     is_blocked    BOOLEAN      NOT NULL DEFAULT FALSE,
+
     created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    is_deleted    BOOLEAN      NOT NULL DEFAULT FALSE,
 
     CONSTRAINT fk_user_role FOREIGN KEY (role_id) REFERENCES roles (role_id)
 );
@@ -40,12 +47,19 @@ CREATE TABLE currencies
 CREATE TABLE wallets
 (
     wallet_id     BIGINT         NOT NULL UNIQUE PRIMARY KEY AUTO_INCREMENT,
-    user_id       BIGINT         NOT NULL UNIQUE,
+    user_id       BIGINT         NOT NULL,
+
+    name          VARCHAR(50)    NOT NULL,
     balance       DECIMAL(19, 2) NOT NULL DEFAULT 0.00,
     currency_code CHAR(3)        NOT NULL DEFAULT 'EUR',
+
+    is_default    BOOLEAN        NOT NULL DEFAULT FALSE,
     version       BIGINT         NOT NULL DEFAULT 0,
+
     created_at    TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    is_deleted    BOOLEAN        NOT NULL DEFAULT FALSE,
 
     CONSTRAINT fk_wallet_user FOREIGN KEY (user_id) REFERENCES users (user_id)
         ON DELETE RESTRICT ON UPDATE RESTRICT,
@@ -59,36 +73,45 @@ CREATE TABLE wallets
 CREATE TABLE cards
 (
     card_id          BIGINT       NOT NULL UNIQUE PRIMARY KEY AUTO_INCREMENT,
-    user_id          BIGINT       NOT NULL UNIQUE,
+    user_id          BIGINT       NOT NULL,
+
+    card_holder      VARCHAR(100) NOT NULL,
     card_suffix      VARCHAR(4)   NOT NULL,
+
     expiration_month INT          NOT NULL,
     expiration_year  INT          NOT NULL,
-    card_holder      VARCHAR(100) NOT NULL,
+
+    status           VARCHAR(20)  NOT NULL,
+
     created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    is_deleted       BOOLEAN      NOT NULL DEFAULT FALSE,
 
     CONSTRAINT fk_card_user FOREIGN KEY (user_id) REFERENCES users (user_id)
-        ON DELETE RESTRICT ON UPDATE RESTRICT
-);
+        ON DELETE RESTRICT ON UPDATE RESTRICT,
 
-# ToDo: Optimize Data Base to handle more than one card for person
+    CHECK ( status IN ('ACTIVE', 'USER_DEACTIVATED', 'ADMIN_DEACTIVATED') )
+);
 
 CREATE TABLE transactions
 (
     transaction_id      BIGINT         NOT NULL UNIQUE PRIMARY KEY AUTO_INCREMENT,
+
     type                VARCHAR(20)    NOT NULL,
     status              VARCHAR(20)    NOT NULL,
+
     amount              DECIMAL(19, 2) NOT NULL,
     currency_code       CHAR(3)        NOT NULL,
 
-    sender_wallet_id    BIGINT         NULL,
-    recipient_wallet_id BIGINT         NULL,
     sender_id           BIGINT         NULL,
     recipient_id        BIGINT         NULL,
 
+    sender_wallet_id    BIGINT         NULL,
+    recipient_wallet_id BIGINT         NULL,
+
     external_reference  VARCHAR(255)   NULL,
+
     created_at          TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at          TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_tx_currencies FOREIGN KEY (currency_code) REFERENCES currencies (currency_code)
         ON DELETE RESTRICT ON UPDATE RESTRICT,
@@ -111,14 +134,14 @@ CREATE TABLE transactions
 );
 
 CREATE INDEX idx_tx_created_at ON transactions (created_at);
+
 CREATE INDEX idx_tx_sender_wallet ON transactions (sender_wallet_id);
 CREATE INDEX idx_tx_recipient_wallet ON transactions (recipient_wallet_id);
+
 CREATE INDEX idx_tx_sender_user ON transactions (sender_id);
 CREATE INDEX idx_tx_recipient_user ON transactions (recipient_id);
+
 CREATE INDEX idx_tx_type ON transactions (type);
 CREATE INDEX idx_tx_status ON transactions (status);
-
-CREATE INDEX idx_tx_sender_time ON transactions (sender_id, created_at);
-CREATE INDEX idx_tx_recipient_time ON transactions (recipient_id, created_at);
 
 CREATE UNIQUE INDEX uq_tx_external_ref ON transactions (external_reference);

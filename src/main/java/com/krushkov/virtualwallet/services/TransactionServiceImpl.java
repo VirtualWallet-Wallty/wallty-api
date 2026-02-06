@@ -2,23 +2,17 @@ package com.krushkov.virtualwallet.services;
 
 import com.krushkov.virtualwallet.exceptions.EntityNotFoundException;
 import com.krushkov.virtualwallet.models.Transaction;
-import com.krushkov.virtualwallet.models.Wallet;
-import com.krushkov.virtualwallet.models.dtos.filters.TransactionFilterOptions;
+import com.krushkov.virtualwallet.models.dtos.requests.transaction.TransactionFilterOptions;
 import com.krushkov.virtualwallet.repositories.TransactionRepository;
 import com.krushkov.virtualwallet.repositories.specifications.TransactionSpecifications;
-import com.krushkov.virtualwallet.security.auth.SecurityContextUtil;
+import com.krushkov.virtualwallet.security.auth.PrincipalContext;
 import com.krushkov.virtualwallet.services.contacts.TransactionService;
 import com.krushkov.virtualwallet.services.contacts.WalletService;
-import com.krushkov.virtualwallet.services.processors.PaymentTransactionProcessor;
-import com.krushkov.virtualwallet.services.processors.TopUpTransactionProcessor;
-import com.krushkov.virtualwallet.services.processors.TransferTransactionProcessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -27,52 +21,67 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final WalletService walletService;
 
-    private final TransferTransactionProcessor transferProcessor;
-    private final TopUpTransactionProcessor topUpProcessor;
-    private final PaymentTransactionProcessor paymentProcessor;
+    @Override
+    @Transactional(readOnly = true)
+    public Transaction getById(Long transactionId) {
+        if (PrincipalContext.isAdmin()) {
+            return findTransaction(transactionId);
+        }
+
+        return findTransactionOwnedBy(transactionId);
+    }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<Transaction> search(TransactionFilterOptions filters, Pageable pageable) {
-        return transactionRepository.findAll(TransactionSpecifications.withFIlters(filters), pageable);
-    }
+        if (PrincipalContext.isAdmin()) {
+            return adminSearch(filters, pageable);
+        }
 
-    @Override
-    public Transaction getById(Long txId) {
-        return transactionRepository.findById(txId)
-                .orElseThrow(() -> new EntityNotFoundException("Transaction", txId));
-    }
-
-    @Override
-    @Transactional
-    public Transaction transfer(Long recipientWalletId, BigDecimal amount) {
-        Long senderId = SecurityContextUtil.getUserDetailsId();
-
-        Wallet senderWallet = walletService.getByUserId(senderId);
-        Wallet recipientWallet = walletService.getById(recipientWalletId);
-
-        Transaction tx = transferProcessor.process(senderWallet, recipientWallet, amount);
-        return transactionRepository.save(tx);
+        return userSearch(filters.withoutUserId(), pageable);
     }
 
     @Override
     @Transactional
-    public Transaction topUp(BigDecimal amount, String externalReference) {
-        Long senderId = SecurityContextUtil.getUserDetailsId();
-
-        Wallet wallet = walletService.getByUserId(senderId);
-
-        Transaction tx = topUpProcessor.process(wallet, amount, externalReference);
-        return transactionRepository.save(tx);
+    public Transaction create(Transaction transaction) {
+        return transactionRepository.save(transaction);
     }
 
-    @Override
-    @Transactional
-    public Transaction pay(BigDecimal amount, String externalReference) {
-        Long senderId = SecurityContextUtil.getUserDetailsId();
+    private Page<Transaction> adminSearch(TransactionFilterOptions filters, Pageable pageable) {
+        return transactionRepository.findAll(TransactionSpecifications.withFilters(filters), pageable);
+    }
 
-        Wallet senderWallet = walletService.getByUserId(senderId);
+    private Page<Transaction> userSearch(TransactionFilterOptions filters, Pageable pageable) {
+        Long principalId = PrincipalContext.getId();
+        TransactionFilterOptions safeFilters = filters.withoutUserId();
 
-        Transaction tx = paymentProcessor.process(senderWallet, amount, externalReference);
-        return transactionRepository.save(tx);
+        validateWalletOwnership(safeFilters, principalId);
+
+        return transactionRepository.findAll(
+                TransactionSpecifications.principal(principalId)
+                        .and(TransactionSpecifications.withFilters(safeFilters)),
+                pageable
+        );
+    }
+
+    private void validateWalletOwnership(TransactionFilterOptions filters, Long principalId) {
+        if (filters.senderWalletId() != null) {
+            walletService.getByIdAndUserId(filters.senderWalletId(), principalId);
+        }
+
+        if (filters.recipientWalletId() != null) {
+            walletService.getByIdAndUserId(filters.recipientWalletId(), principalId);
+        }
+    }
+
+    private Transaction findTransaction(Long targetTransactionId) {
+        return transactionRepository.findById(targetTransactionId)
+                .orElseThrow(() -> new EntityNotFoundException("Transaction", targetTransactionId));
+    }
+
+    private Transaction findTransactionOwnedBy(Long targetTransactionId) {
+        Long principalId = PrincipalContext.getId();
+        return transactionRepository.findAccessibleById(targetTransactionId, principalId)
+                .orElseThrow(() -> new EntityNotFoundException("Transaction", targetTransactionId));
     }
 }

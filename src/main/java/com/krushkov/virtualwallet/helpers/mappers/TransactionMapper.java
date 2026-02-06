@@ -1,19 +1,20 @@
 package com.krushkov.virtualwallet.helpers.mappers;
 
 import com.krushkov.virtualwallet.models.Transaction;
-import com.krushkov.virtualwallet.models.dtos.responses.TransactionResponse;
-import org.springframework.stereotype.Component;
+import com.krushkov.virtualwallet.models.dtos.responses.transaction.TransactionLongResponse;
+import com.krushkov.virtualwallet.models.dtos.responses.transaction.TransactionShortResponse;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class TransactionMapper {
+@Mapper(
+        componentModel = "spring",
+        uses = {UserMapper.class, WalletMapper.class, CurrencyMapper.class}
+)
+public interface TransactionMapper {
 
-    public TransactionResponse toResponse(Transaction tx) {
-        return new TransactionResponse(
-                tx.getId(),
-                tx.getType(),
-                tx.getStatus(),
-                tx.getAmount(),
-                tx.getCreatedAt()
-        );
-    }
+    @Mapping(target = "senderWalletId", source = "senderWallet.id")
+    @Mapping(target = "recipientWalletId", source = "recipientWallet.id")
+    TransactionShortResponse toShort(Transaction transaction);
+
+    TransactionLongResponse toLong(Transaction transaction);
 }

@@ -1,5 +1,6 @@
-package com.krushkov.virtualwallet.models.dtos.filters;
+package com.krushkov.virtualwallet.models.dtos.requests.user;
 
+import com.krushkov.virtualwallet.helpers.ValidationMessages;
 import jakarta.validation.constraints.AssertTrue;
 
 import java.time.LocalDateTime;
@@ -16,7 +17,7 @@ public record UserFilterOptions(
         LocalDateTime createdFrom,
         LocalDateTime createdTo
 ) {
-    @AssertTrue(message = "Created from must be before or equal to created to.")
+    @AssertTrue(message = ValidationMessages.USER_CREATE_RANGE_ERROR)
     public boolean isValidCreateRange() {
         if (createdFrom == null || createdTo == null) {
             return true;

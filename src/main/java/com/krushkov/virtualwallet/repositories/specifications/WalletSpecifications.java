@@ -2,7 +2,7 @@ package com.krushkov.virtualwallet.repositories.specifications;
 
 import jakarta.persistence.criteria.Predicate;
 import com.krushkov.virtualwallet.models.Wallet;
-import com.krushkov.virtualwallet.models.dtos.filters.WalletFilterOptions;
+import com.krushkov.virtualwallet.models.dtos.requests.wallet.WalletFilterOptions;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;

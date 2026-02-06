@@ -2,11 +2,22 @@ package com.krushkov.virtualwallet.services.contacts;
 
 import com.krushkov.virtualwallet.models.Card;
 
+import java.util.List;
+
 public interface CardService {
 
-    Card getById(Long cardId);
+    Card getById(Long targetCardId);
 
-    Card addCard(Long userId, Card card);
+    List<Card> getAllByUserId(Long targetCardId);
 
-    void removeCard(Long cardId);
+    List<Card> getAllMyCards();
+
+    Card add(Card card);
+
+    void activate(Long targetCardId);
+
+    void deactivate(Long targetCardId);
+
+    void remove(Long targetCardId);
+
 }

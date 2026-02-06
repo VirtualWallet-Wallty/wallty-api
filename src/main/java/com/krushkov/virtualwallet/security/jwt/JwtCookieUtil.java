@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtCookieUtil {
 
-    private static final String COOKIE_NAME = "JWT_TOKEN";
+    public static final String COOKIE_NAME = "JWT_TOKEN";
 
     @Value("${security.jwt.expiration}")
     private long expiration;
@@ -17,7 +17,7 @@ public class JwtCookieUtil {
         ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, token)
                 .httpOnly(true)
                 .secure(false)
-                .sameSite("Lax")
+                .sameSite("None")
                 .path("/")
                 .maxAge(expiration)
                 .build();
@@ -29,7 +29,7 @@ public class JwtCookieUtil {
         ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, "")
                 .httpOnly(true)
                 .secure(false)
-                .sameSite("Lax")
+                .sameSite("None")
                 .path("/")
                 .maxAge(0)
                 .build();

@@ -1,15 +1,19 @@
-package com.krushkov.virtualwallet.models.dtos.responses;
+package com.krushkov.virtualwallet.models.dtos.responses.transaction;
 
 import com.krushkov.virtualwallet.models.enums.TransactionStatus;
 import com.krushkov.virtualwallet.models.enums.TransactionType;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
-public record TransactionResponse(
+public record TransactionShortResponse(
         Long id,
+
         TransactionType type,
         TransactionStatus status,
+
         BigDecimal amount,
-        LocalDateTime createdAt
+        String currencyCode,
+
+        Long senderWalletId,
+        Long recipientWalletId
 ) {}

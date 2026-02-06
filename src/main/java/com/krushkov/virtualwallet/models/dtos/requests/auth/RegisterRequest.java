@@ -1,4 +1,4 @@
-package com.krushkov.virtualwallet.models.dtos.requests;
+package com.krushkov.virtualwallet.models.dtos.requests.auth;
 
 import com.krushkov.virtualwallet.helpers.ValidationMessages;
 import jakarta.validation.constraints.Email;

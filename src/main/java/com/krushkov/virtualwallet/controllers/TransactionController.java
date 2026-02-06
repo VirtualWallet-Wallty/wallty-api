@@ -1,10 +1,11 @@
 package com.krushkov.virtualwallet.controllers;
 
 import com.krushkov.virtualwallet.helpers.mappers.TransactionMapper;
-import com.krushkov.virtualwallet.models.dtos.filters.TransactionFilterOptions;
+import com.krushkov.virtualwallet.models.dtos.requests.transaction.TransactionFilterOptions;
 import com.krushkov.virtualwallet.models.dtos.requests.PaymentRequest;
 import com.krushkov.virtualwallet.models.dtos.requests.TransferRequest;
-import com.krushkov.virtualwallet.models.dtos.responses.TransactionResponse;
+import com.krushkov.virtualwallet.models.dtos.responses.transaction.TransactionLongResponse;
+import com.krushkov.virtualwallet.models.dtos.responses.transaction.TransactionShortResponse;
 import com.krushkov.virtualwallet.models.enums.TransactionStatus;
 import com.krushkov.virtualwallet.models.enums.TransactionType;
 import com.krushkov.virtualwallet.services.contacts.TransactionService;
@@ -12,7 +13,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -26,8 +26,13 @@ public class TransactionController {
     private final TransactionService transactionService;
     private final TransactionMapper transactionMapper;
 
+    @GetMapping("/{targetTransactionId}")
+    public TransactionLongResponse getById(@PathVariable Long targetTransactionId) {
+        return transactionMapper.toLong(transactionService.getById(targetTransactionId));
+    }
+
     @GetMapping
-    public Page<TransactionResponse> search(
+    public Page<TransactionShortResponse> search(
             @RequestParam(required = false) Long senderId,
             @RequestParam(required = false) Long recipientId,
             @RequestParam(required = false) Long senderWalletId,
@@ -49,25 +54,6 @@ public class TransactionController {
         );
 
         return transactionService.search(filters, pageable)
-                .map(transactionMapper::toResponse);
-    }
-
-    @GetMapping("/{transactionId}")
-    public TransactionResponse getById(@PathVariable Long transactionId) {
-        return transactionMapper.toResponse(transactionService.getById(transactionId));
-    }
-
-    @PostMapping("/transfer")
-    public TransactionResponse transfer(@Valid @RequestBody TransferRequest request) {
-        return transactionMapper.toResponse(
-                transactionService.transfer(request.recipientUserId(), request.amount())
-        );
-    }
-
-    @PostMapping("/pay")
-    public TransactionResponse pay(@Valid @RequestBody PaymentRequest request) {
-        return transactionMapper.toResponse(
-                transactionService.pay(request.amount(), request.merchantReference())
-        );
+                .map(transactionMapper::toShort);
     }
 }

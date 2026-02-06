@@ -1,31 +1,28 @@
 package com.krushkov.virtualwallet.helpers.mappers;
 
 import com.krushkov.virtualwallet.models.Card;
-import com.krushkov.virtualwallet.models.User;
-import com.krushkov.virtualwallet.models.dtos.requests.CardCreateRequest;
-import com.krushkov.virtualwallet.models.dtos.responses.CardResponse;
-import org.springframework.stereotype.Component;
+import com.krushkov.virtualwallet.models.dtos.requests.card.CardCreateRequest;
+import com.krushkov.virtualwallet.models.dtos.responses.card.CardLongResponse;
+import com.krushkov.virtualwallet.models.dtos.responses.card.CardShortResponse;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class CardMapper {
+@Mapper(componentModel = "spring")
+public interface CardMapper {
 
-    public CardResponse toResponse(Card card) {
-        return new CardResponse(
-                card.getId(),
-                card.getCardSuffix(),
-                card.getCardHolder(),
-                card.getExpirationMonth(),
-                card.getExpirationYear()
-        );
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(
+            target = "cardSuffix", expression =
+            "java(request.cardNumber().substring(request.cardNumber().length() - 4))"
+    )
+    Card fromCreate(CardCreateRequest request);
 
-    public Card toEntity(CardCreateRequest request, User user) {
-        Card card = new Card();
-        card.setUser(user);
-        card.setCardSuffix(request.cardNumber().substring(request.cardNumber().length() - 4));
-        card.setExpirationMonth(request.expirationMonth());
-        card.setExpirationYear(request.expirationYear());
-        card.setCardHolder(request.cardHolder());
-        return card;
-    }
+    @Mapping(target = "ownerId", source = "user.id")
+    CardShortResponse toShort(Card card);
+
+     CardLongResponse toLong(Card card);
 }

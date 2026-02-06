@@ -1,5 +1,6 @@
-package com.krushkov.virtualwallet.models.dtos.filters;
+package com.krushkov.virtualwallet.models.dtos.requests.transaction;
 
+import com.krushkov.virtualwallet.helpers.ValidationMessages;
 import com.krushkov.virtualwallet.models.enums.TransactionStatus;
 import com.krushkov.virtualwallet.models.enums.TransactionType;
 import jakarta.validation.constraints.AssertTrue;
@@ -23,7 +24,7 @@ public record TransactionFilterOptions(
         BigDecimal minAmount,
         BigDecimal maxAmount
 ) {
-    @AssertTrue(message = "Created from must be before or equal to created to.")
+    @AssertTrue(message = ValidationMessages.TRANSACTION_CREATE_RANGE_ERROR)
     public boolean isValidCreateRange() {
         if (createdFrom == null || createdTo == null) {
             return true;
@@ -31,11 +32,26 @@ public record TransactionFilterOptions(
         return !createdFrom.isAfter(createdTo);
     }
 
-    @AssertTrue(message = "Min amount must be less than or equal to max amount.")
+    @AssertTrue(message = ValidationMessages.TRANSACTION_AMOUNT_RANGE_ERROR)
     public boolean isValidAmountRange() {
         if (minAmount == null || maxAmount == null) {
             return true;
         }
         return minAmount.compareTo(maxAmount) <= 0;
+    }
+
+    public TransactionFilterOptions withoutUserId() {
+        return new TransactionFilterOptions(
+                null,
+                null,
+                senderWalletId,
+                recipientWalletId,
+                type,
+                status,
+                createdFrom,
+                createdTo,
+                minAmount,
+                maxAmount
+        );
     }
 }
