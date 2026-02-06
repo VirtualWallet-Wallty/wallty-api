@@ -24,9 +24,12 @@ public class Wallet {
     @Column(name = "wallet_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Column(name = "name",nullable = false, length = 50)
+    private String name;
 
     @Column(name = "balance", nullable = false, precision = 19, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
@@ -39,11 +42,17 @@ public class Wallet {
     @Column(name = "version")
     private Long version;
 
+    @Column(name = "is_default", nullable = false)
+    private boolean isDefault;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Column(name = "is_deleted")
+    private boolean isDeleted = false;
 
     @PrePersist
     public void onCreate() {

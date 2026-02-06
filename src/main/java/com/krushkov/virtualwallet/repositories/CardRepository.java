@@ -2,17 +2,20 @@ package com.krushkov.virtualwallet.repositories;
 
 import com.krushkov.virtualwallet.models.Card;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface CardRepository extends JpaRepository<Card, Long> {
 
-    Optional<Card> findById(Long cardId);
+    Optional<Card> findByIdAndIsDeletedFalse(Long cardId);
 
-    Optional<Card> findByUserId(Long userId);
+    List<Card> findAllByUserIdAndIsDeletedFalse(Long userId);
 
-    boolean existsByUserId(Long userId);
+    Optional<Card> findByIdAndUserIdAndIsDeletedFalse(Long cardId, Long userId);
 
+    boolean existsByUserIdAndCardSuffixAndIsDeletedFalse(Long userId, String cardSuffix);
 }

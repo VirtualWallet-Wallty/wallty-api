@@ -1,5 +1,6 @@
 package com.krushkov.virtualwallet.models;
 
+import com.krushkov.virtualwallet.models.enums.CardStatus;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -23,9 +24,12 @@ public class Card {
     @Column(name = "card_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Column(name = "card_holder", nullable = false, length = 100)
+    private String cardHolder;
 
     @Column(name = "card_suffix", nullable = false, length = 4)
     private String cardSuffix;
@@ -36,23 +40,18 @@ public class Card {
     @Column(name = "expiration_year", nullable = false)
     private Integer expirationYear;
 
-    @Column(name = "card_holder", nullable = false, length = 100)
-    private String cardHolder;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private CardStatus status = CardStatus.ACTIVE;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    @Column(name = "is_deleted")
+    private boolean isDeleted = false;
 
     @PrePersist
     public void onCreate() {
         createdAt = LocalDateTime.now();
-        updatedAt = createdAt;
-    }
-
-    @PreUpdate
-    public void onUpdate() {
-        updatedAt = LocalDateTime.now();
     }
 }

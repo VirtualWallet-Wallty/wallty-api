@@ -20,8 +20,8 @@ public class UserPrincipalService implements UserDetailsService {
                 ? NormalizationHelper.normalizeStringToLower(identifier)
                 : identifier;
 
-        User user = userRepository.findByUsername(normalized)
-                .orElseGet(() -> userRepository.findByEmail(normalized)
+        User user = userRepository.findByUsernameAndIsDeletedFalse(normalized)
+                .orElseGet(() -> userRepository.findByEmailAndIsDeletedFalse(normalized)
                         .orElseThrow(() -> new UsernameNotFoundException("User not found: " + identifier)));
 
         return new UserPrincipal(user);

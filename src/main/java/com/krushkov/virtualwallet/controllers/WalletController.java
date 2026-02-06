@@ -1,20 +1,23 @@
 package com.krushkov.virtualwallet.controllers;
 
 import com.krushkov.virtualwallet.helpers.mappers.WalletMapper;
-import com.krushkov.virtualwallet.models.dtos.filters.WalletFilterOptions;
+import com.krushkov.virtualwallet.models.Wallet;
+import com.krushkov.virtualwallet.models.dtos.requests.wallet.WalletCreateRequest;
+import com.krushkov.virtualwallet.models.dtos.requests.wallet.WalletFilterOptions;
 import com.krushkov.virtualwallet.models.dtos.requests.TopUpRequest;
-import com.krushkov.virtualwallet.models.dtos.responses.WalletResponse;
-import com.krushkov.virtualwallet.models.enums.CurrencyCode;
+import com.krushkov.virtualwallet.models.dtos.responses.wallet.WalletLongResponse;
+import com.krushkov.virtualwallet.models.dtos.responses.wallet.WalletShortResponse;
+import com.krushkov.virtualwallet.services.contacts.TopUpService;
 import com.krushkov.virtualwallet.services.contacts.TransactionService;
 import com.krushkov.virtualwallet.services.contacts.WalletService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/wallets")
@@ -23,12 +26,35 @@ public class WalletController {
 
     private final WalletService walletService;
     private final WalletMapper walletMapper;
-    private final TransactionService transactionService;
+
+    @GetMapping("/{targetWalletId}")
+    public WalletLongResponse getById(@PathVariable Long targetWalletId) {
+        return walletMapper.toLong(walletService.getById(targetWalletId));
+    }
+
+    @GetMapping("/default")
+    public WalletLongResponse getMyDefault() {
+        return walletMapper.toLong(walletService.getMyDefault());
+    }
+
+    @GetMapping("/users/{targetUserId}")
+    public List<WalletShortResponse> getAllByUserId(@PathVariable Long targetUserId) {
+        return walletService.getAllByUserId(targetUserId).stream()
+                .map(walletMapper::toShort)
+                .toList();
+    }
+
+    @GetMapping("/my")
+    public List<WalletShortResponse> getMyAll() {
+        return walletService.getMyAll().stream()
+                .map(walletMapper::toShort)
+                .toList();
+    }
 
     @GetMapping
-    public Page<WalletResponse> search(
+    public Page<WalletShortResponse> search(
             @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) CurrencyCode currencyCode,
+            @RequestParam(required = false) String currencyCode,
             @RequestParam(required = false) BigDecimal minBalance,
             @RequestParam(required = false) BigDecimal maxBalance,
             Pageable pageable
@@ -40,16 +66,17 @@ public class WalletController {
         );
 
         return walletService.search(filters, pageable)
-                .map(walletMapper::toResponse);
+                .map(walletMapper::toShort);
     }
 
-    @GetMapping("/{walletId}")
-    public WalletResponse getById(@PathVariable Long walletId) {
-        return walletMapper.toResponse(walletService.getById(walletId));
+    @PostMapping
+    public WalletLongResponse create(@Valid @RequestBody WalletCreateRequest request) {
+        Wallet wallet = walletService.create(walletMapper.fromCreate(request));
+        return walletMapper.toLong(wallet);
     }
 
-    @PostMapping("/{walletId}/top-up")
-    public void topUp(@Valid @RequestBody TopUpRequest request) {
-        transactionService.topUp(request.amount(), request.merchantReference());
+    @PatchMapping("/{targetWalletId}/set-default")
+    public void setDefault(@PathVariable Long targetWalletId) {
+        walletService.setDefault(targetWalletId);
     }
 }

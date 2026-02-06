@@ -1,14 +1,14 @@
 package com.krushkov.virtualwallet.services;
 
 import com.krushkov.virtualwallet.exceptions.InvalidOperationException;
-import com.krushkov.virtualwallet.helpers.mappers.AuthMapper;
-import com.krushkov.virtualwallet.models.dtos.responses.UserPrincipalResponse;
+import com.krushkov.virtualwallet.helpers.ValidationMessages;
+import com.krushkov.virtualwallet.helpers.mappers.UserMapper;
+import com.krushkov.virtualwallet.models.dtos.responses.auth.UserPrincipalResponse;
 import com.krushkov.virtualwallet.security.auth.UserPrincipal;
 import com.krushkov.virtualwallet.security.jwt.JwtCookieUtil;
 import com.krushkov.virtualwallet.security.jwt.JwtUtil;
 import com.krushkov.virtualwallet.models.User;
-import com.krushkov.virtualwallet.models.dtos.requests.LoginRequest;
-import com.krushkov.virtualwallet.models.dtos.requests.RegisterRequest;
+import com.krushkov.virtualwallet.models.dtos.requests.auth.LoginRequest;
 import com.krushkov.virtualwallet.services.contacts.AuthService;
 import com.krushkov.virtualwallet.services.contacts.UserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,20 +29,20 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final JwtCookieUtil jwtCookieUtil;
     private final UserService userService;
-    private final AuthMapper authMapper;
 
     @Override
-    public void register(RegisterRequest request, HttpServletResponse response) {
-        User user = authMapper.toObject(request);
+    @Transactional
+    public void register(User user) {
         userService.create(user);
         //ToDo: Email verification
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserPrincipalResponse login(LoginRequest request, HttpServletResponse response) {
         if (request.identifier() == null || request.identifier().isBlank()
                 || request.password() == null || request.password().isBlank()) {
-            throw new InvalidOperationException("Username/Email and password are required.");
+            throw new InvalidOperationException(ValidationMessages.IDENTIFIER_PASSWORD_MISSING_ERROR);
         }
 
         try {
@@ -60,15 +61,16 @@ public class AuthServiceImpl implements AuthService {
             return new UserPrincipalResponse(
                     userDetails.getId(),
                     userDetails.getUsername(),
-                    userDetails.getRole().getName().name(),
-                    userDetails.getIsBlocked()
+                    userDetails.getRole().name(),
+                    userDetails.isBlocked()
             );
         } catch (BadCredentialsException e) {
-            throw new InvalidOperationException("Username/email or password are wrong.");
+            throw new InvalidOperationException(ValidationMessages.IDENTIFIER_PASSWORD_WRONG_ERROR);
         }
     }
 
     @Override
+    @Transactional
     public void logout(HttpServletResponse response) {
         jwtCookieUtil.clearTokenCookie(response);
         SecurityContextHolder.clearContext();

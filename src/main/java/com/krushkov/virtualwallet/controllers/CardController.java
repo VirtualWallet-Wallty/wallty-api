@@ -3,15 +3,17 @@ package com.krushkov.virtualwallet.controllers;
 import com.krushkov.virtualwallet.helpers.mappers.CardMapper;
 import com.krushkov.virtualwallet.models.Card;
 import com.krushkov.virtualwallet.models.User;
-import com.krushkov.virtualwallet.models.dtos.requests.CardCreateRequest;
-import com.krushkov.virtualwallet.models.dtos.responses.CardResponse;
-import com.krushkov.virtualwallet.security.auth.SecurityContextUtil;
+import com.krushkov.virtualwallet.models.dtos.requests.card.CardCreateRequest;
+import com.krushkov.virtualwallet.models.dtos.responses.card.CardLongResponse;
+import com.krushkov.virtualwallet.models.dtos.responses.card.CardShortResponse;
 import com.krushkov.virtualwallet.services.contacts.CardService;
 import com.krushkov.virtualwallet.services.contacts.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/cards")
@@ -19,27 +21,45 @@ import org.springframework.web.bind.annotation.*;
 public class CardController {
 
     private final CardService cardService;
-    private final UserService userService;
-
     private final CardMapper cardMapper;
 
-    @GetMapping("/{cardId}")
-    public CardResponse getById(@PathVariable Long cardId) {
-        return cardMapper.toResponse(cardService.getById(cardId));
+    @GetMapping("/{targetCardId}")
+    public CardLongResponse getById(@PathVariable Long targetCardId) {
+        return cardMapper.toLong(cardService.getById(targetCardId));
     }
 
-    @PostMapping("/users/{userId}")
-    public CardResponse addCard(
-            @PathVariable Long userId,
-            @Valid @RequestBody CardCreateRequest request
-    ) {
-        User user = userService.getById(userId);
-        Card card = cardMapper.toEntity(request, user);
-        return cardMapper.toResponse(cardService.addCard(userId, card));
+    @GetMapping("/my")
+    public List<CardShortResponse> getMyAll() {
+        return cardService.getAllMyCards().stream()
+                .map(cardMapper::toShort)
+                .toList();
     }
 
-    @DeleteMapping("/{cardId}")
-    public void remove(@PathVariable Long cardId) {
-        cardService.removeCard(cardId);
+    @GetMapping("/users/{targetUserId}")
+    public List<CardShortResponse> getAllByUserId(@PathVariable Long targetUserId) {
+        return cardService.getAllByUserId(targetUserId).stream()
+                .map(cardMapper::toShort)
+                .toList();
+    }
+
+    @PostMapping
+    public CardLongResponse add(@Valid @RequestBody CardCreateRequest request) {
+        Card card = cardMapper.fromCreate(request);
+        return cardMapper.toLong(cardService.add(card));
+    }
+
+    @PatchMapping("/{targetCardId}/activate")
+    public void activate(@PathVariable Long targetCardId) {
+        cardService.activate(targetCardId);
+    }
+
+    @PatchMapping("/{targetCardId}/deactivate")
+    public void deactivate(@PathVariable Long targetCardId) {
+        cardService.deactivate(targetCardId);
+    }
+
+    @DeleteMapping("/{targetCardId}")
+    public void remove(@PathVariable Long targetCardId) {
+        cardService.remove(targetCardId);
     }
 }

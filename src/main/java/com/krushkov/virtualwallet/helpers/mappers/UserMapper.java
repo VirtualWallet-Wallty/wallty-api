@@ -1,22 +1,35 @@
 package com.krushkov.virtualwallet.helpers.mappers;
 
 import com.krushkov.virtualwallet.models.User;
-import com.krushkov.virtualwallet.models.dtos.responses.UserResponse;
-import org.springframework.stereotype.Component;
+import com.krushkov.virtualwallet.models.dtos.requests.auth.RegisterRequest;
+import com.krushkov.virtualwallet.models.dtos.requests.user.UserUpdateRequest;
+import com.krushkov.virtualwallet.models.dtos.responses.user.UserLongResponse;
+import com.krushkov.virtualwallet.models.dtos.responses.user.UserShortResponse;
+import org.mapstruct.*;
 
-@Component
-public class UserMapper {
+@Mapper(
+        componentModel = "spring",
+        uses = {WalletMapper.class, CardMapper.class}
+)
+public interface UserMapper {
 
-    public UserResponse toResponse(User user) {
-        return new UserResponse(
-                user.getId(),
-                user.getPhoneNumber(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getPhoneNumber(),
-                user.getIsBlocked(),
-                user.getCreatedAt()
-        );
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "wallets", ignore = true)
+    @Mapping(target = "cards", ignore = true)
+    @Mapping(target = "blocked", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    User fromRegister(RegisterRequest request);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "password", ignore = true)
+    void update(@MappingTarget User user, UserUpdateRequest request);
+
+    UserShortResponse toShort(User user);
+
+    @Mapping(target = "role", source = "role.name")
+    @Mapping(target = "isBlocked", source = "blocked")
+    UserLongResponse toLong(User user);
 }

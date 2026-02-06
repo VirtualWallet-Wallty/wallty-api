@@ -1,23 +1,28 @@
 package com.krushkov.virtualwallet.services.contacts;
 
 import com.krushkov.virtualwallet.models.User;
-import com.krushkov.virtualwallet.models.dtos.filters.UserFilterOptions;
+import com.krushkov.virtualwallet.models.dtos.requests.user.UserFilterOptions;
+import com.krushkov.virtualwallet.models.dtos.requests.user.UserUpdateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface UserService {
 
-    Page<User> search(UserFilterOptions filters, Pageable pageable);
+    User getById(Long targetUserId);
 
-    User getById(Long id);
+    User getByUsername(String targetUsername);
+
+    User getByEmail(String targetEmail);
+
+    Page<User> search(UserFilterOptions filters, Pageable pageable);
 
     User create(User user);
 
-    User update(Long id, User user);
+    User update(UserUpdateRequest request);
 
-    void blockUser(Long id);
+    void block(Long targetUserId);
 
-    void unblockUser(Long id);
+    void unblock(Long targetUserId);
 
     long count();
 }

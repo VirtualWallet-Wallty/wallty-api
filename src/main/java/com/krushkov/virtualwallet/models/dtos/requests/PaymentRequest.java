@@ -1,17 +1,17 @@
 package com.krushkov.virtualwallet.models.dtos.requests;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import com.krushkov.virtualwallet.helpers.ValidationMessages;
+import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 
 public record PaymentRequest(
 
-        @Positive(message = "Amount must be greater that zero.")
-        @NotNull(message = "Amount must be not null.")
+        @DecimalMin(value = "0.01", inclusive = true, message = ValidationMessages.AMOUNT_LENGTH_ERROR)
+        @Digits(integer = 15, fraction = 2)
+        @NotNull(message = ValidationMessages.AMOUNT_NOT_NULL_ERROR)
         BigDecimal amount,
 
-        @NotBlank(message = "Merchant reference is required.")
+        @NotBlank(message = ValidationMessages.MERCHANT_NOT_NULL_ERROR)
         String merchantReference
 ) {}

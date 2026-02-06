@@ -6,19 +6,39 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface WalletRepository
         extends JpaRepository<Wallet, Long>, JpaSpecificationExecutor<Wallet> {
 
-    Wallet findByUserId(Long userId);
+    Optional<Wallet> findByIdAndIsDeletedFalse(Long walletId);
 
-    @Lock(LockModeType.OPTIMISTIC)
-    @Query("select w from Wallet w where w.id = :id")
-    Optional<Wallet> findByIdForUpdate(@Param("id") Long id);
+    List<Wallet> findAllByUserIdAndIsDeletedFalse(Long userId);
+
+    Optional<Wallet> findByIdAndUserIdAndIsDeletedFalse(Long walletId, Long userId);
+
+    Optional<Wallet> findByUserIdAndIsDefaultTrueAndIsDeletedFalse(Long userId);
+
+    @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
+    @Query("""
+            select w from Wallet w
+            where w.id = :walletId
+            and w.user.id = :userId
+            and w.isDeleted = false
+            """)
+    Optional<Wallet> findWithLockByIdAndUserIdAndIsDeletedFalse(Long walletId, Long userId);
+
+    @Query("""
+            select w from Wallet w
+            where w.id = :walletId
+            and w.isDeleted = false
+            """)
+    Optional<Wallet> findWithLockByIdAndIsDeletedFalse(Long walletId);
+
+    boolean existsByNameAndUserIdAndIsDeletedFalse(String cardName, Long userId);
 
 }

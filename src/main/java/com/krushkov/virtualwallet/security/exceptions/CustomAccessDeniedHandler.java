@@ -1,6 +1,7 @@
 package com.krushkov.virtualwallet.security.exceptions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.krushkov.virtualwallet.helpers.ValidationMessages;
 import com.krushkov.virtualwallet.models.dtos.responses.api.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,8 +17,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
-    public static final String message = "You are not allowed to access this resource.";
-
     private final ObjectMapper objectMapper;
 
     @Override
@@ -27,7 +26,11 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
             AccessDeniedException accessDeniedException
     ) throws IOException {
         ApiErrorResponse errorResponse =
-                ApiErrorResponse.error(HttpStatus.FORBIDDEN.value(), request.getRequestURI(), message);
+                ApiErrorResponse.error(
+                        HttpStatus.FORBIDDEN.value(),
+                        request.getRequestURI(),
+                        ValidationMessages.API_ACCESS_ERROR
+                );
 
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType("application/json");

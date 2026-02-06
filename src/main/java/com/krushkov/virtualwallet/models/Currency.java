@@ -1,7 +1,6 @@
 package com.krushkov.virtualwallet.models;
 
 import jakarta.persistence.*;
-import com.krushkov.virtualwallet.models.enums.CurrencyCode;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,9 +17,8 @@ public class Currency {
 
     @Id
     @EqualsAndHashCode.Include
-    @Enumerated(EnumType.STRING)
     @Column(name = "currency_code", length = 3, columnDefinition = "CHAR(3)")
-    private CurrencyCode code;
+    private String code;
 
     @Column(name = "name", nullable = false, length = 50)
     private String name;
@@ -32,5 +30,5 @@ public class Currency {
     private Integer decimals;
 
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive;
+    private boolean isActive = true;
 }
