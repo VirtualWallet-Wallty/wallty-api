@@ -1,9 +1,11 @@
 package com.krushkov.virtualwallet.controllers;
 
+import com.krushkov.virtualwallet.helpers.factories.ApiResponseFactory;
 import com.krushkov.virtualwallet.helpers.mappers.UserMapper;
 import com.krushkov.virtualwallet.models.User;
 import com.krushkov.virtualwallet.models.dtos.requests.user.UserFilterOptions;
 import com.krushkov.virtualwallet.models.dtos.requests.user.UserUpdateRequest;
+import com.krushkov.virtualwallet.models.dtos.responses.api.ApiResponse;
 import com.krushkov.virtualwallet.models.dtos.responses.user.UserLongResponse;
 import com.krushkov.virtualwallet.models.dtos.responses.user.UserShortResponse;
 import com.krushkov.virtualwallet.services.contacts.UserService;
@@ -11,6 +13,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -24,12 +28,13 @@ public class UserController {
     private final UserMapper userMapper;
 
     @GetMapping("/{targetUserId}")
-    public UserLongResponse getById(@PathVariable Long targetUserId) {
-        return userMapper.toLong(userService.getById(targetUserId));
+    public ResponseEntity<ApiResponse<UserLongResponse>> getById(@PathVariable Long targetUserId) {
+        UserLongResponse userLongResponse = userMapper.toLong(userService.getById(targetUserId));
+        return ApiResponseFactory.ok(userLongResponse);
     }
 
     @GetMapping
-    public Page<UserShortResponse> search(
+    public ResponseEntity<ApiResponse<Page<UserShortResponse>>> search(
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
@@ -46,22 +51,27 @@ public class UserController {
                 createdFrom, createdTo
         );
 
-        return userService.search(filters, pageable)
+        Page<UserShortResponse> userShortResponsePage = userService.search(filters, pageable)
                 .map(userMapper::toShort);
+
+        return ApiResponseFactory.ok(userShortResponsePage);
     }
 
     @PutMapping
-    public UserLongResponse update(@Valid @RequestBody UserUpdateRequest request) {
-        return userMapper.toLong(userService.update(request));
+    public ResponseEntity<ApiResponse<UserLongResponse>> update(@Valid @RequestBody UserUpdateRequest request) {
+        UserLongResponse userLongResponse = userMapper.toLong(userService.update(request));
+        return ApiResponseFactory.ok("User updated successfully.", userLongResponse);
     }
 
     @PatchMapping("/{targetUserId}/block")
-    public void block(@PathVariable Long targetUserId) {
+    public ResponseEntity<ApiResponse<Void>> block(@PathVariable Long targetUserId) {
         userService.block(targetUserId);
+        return ApiResponseFactory.noContent("User blocked successfully.");
     }
 
     @PatchMapping("/{targetUserId}/unblock")
-    public void unblock(@PathVariable Long targetUserId) {
+    public ResponseEntity<ApiResponse<Void>> unblock(@PathVariable Long targetUserId) {
         userService.unblock(targetUserId);
+        return ApiResponseFactory.noContent("User unblocked successfully.");
     }
 }

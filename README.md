@@ -5,6 +5,11 @@ Developing a secure web application for digital wallet management, enabling seam
 # STATUS: Currently in process.
 
 # Latest updates:
+```
+Log #7:
+- Fix ApiResponse. Every response from backend now returns a uniform structure. 
+- Fix pay and transfer method namings in the controllers.  
+```
 ``` 
 Log #6:
 - The project now supports multiple cards and wallets.

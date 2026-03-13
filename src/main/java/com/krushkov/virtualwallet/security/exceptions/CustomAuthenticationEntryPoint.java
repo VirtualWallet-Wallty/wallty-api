@@ -2,11 +2,12 @@ package com.krushkov.virtualwallet.security.exceptions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.krushkov.virtualwallet.helpers.ValidationMessages;
-import com.krushkov.virtualwallet.models.dtos.responses.api.ApiErrorResponse;
+import com.krushkov.virtualwallet.models.dtos.responses.api.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -25,14 +26,14 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             HttpServletResponse response,
             AuthenticationException authException
     ) throws IOException {
-        ApiErrorResponse errorResponse = ApiErrorResponse.error(
-                HttpStatus.UNAUTHORIZED.value(),
+        ApiResponse<Void> apiResponse = ApiResponse.error(
                 request.getRequestURI(),
-                ValidationMessages.AUTHENTICATION_MISSING_ERROR
+                ValidationMessages.AUTHENTICATION_MISSING_ERROR,
+                null
         );
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.setContentType("application/json");
-        objectMapper.writeValue(response.getOutputStream(), errorResponse);
+        response.setContentType("application/json;charset=UTF-8");
+        objectMapper.writeValue(response.getOutputStream(), apiResponse);
     }
 }
