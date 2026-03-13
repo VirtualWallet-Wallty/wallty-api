@@ -1,15 +1,19 @@
 package com.krushkov.virtualwallet.controllers;
 
+import com.krushkov.virtualwallet.helpers.factories.ApiResponseFactory;
 import com.krushkov.virtualwallet.helpers.mappers.CardMapper;
 import com.krushkov.virtualwallet.models.Card;
 import com.krushkov.virtualwallet.models.User;
 import com.krushkov.virtualwallet.models.dtos.requests.card.CardCreateRequest;
+import com.krushkov.virtualwallet.models.dtos.responses.api.ApiResponse;
 import com.krushkov.virtualwallet.models.dtos.responses.card.CardLongResponse;
 import com.krushkov.virtualwallet.models.dtos.responses.card.CardShortResponse;
 import com.krushkov.virtualwallet.services.contacts.CardService;
 import com.krushkov.virtualwallet.services.contacts.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -24,42 +28,51 @@ public class CardController {
     private final CardMapper cardMapper;
 
     @GetMapping("/{targetCardId}")
-    public CardLongResponse getById(@PathVariable Long targetCardId) {
-        return cardMapper.toLong(cardService.getById(targetCardId));
+    public ResponseEntity<ApiResponse<CardLongResponse>> getById(@PathVariable Long targetCardId) {
+        CardLongResponse cardLongResponse = cardMapper.toLong(cardService.getById(targetCardId));
+        return ApiResponseFactory.ok(cardLongResponse);
     }
 
     @GetMapping("/my")
-    public List<CardShortResponse> getMyAll() {
-        return cardService.getAllMyCards().stream()
+    public ResponseEntity<ApiResponse<List<CardShortResponse>>> getMyAll() {
+        List<CardShortResponse> cardShortResponseList = cardService.getAllMyCards().stream()
                 .map(cardMapper::toShort)
                 .toList();
+
+        return ApiResponseFactory.ok(cardShortResponseList);
     }
 
     @GetMapping("/users/{targetUserId}")
-    public List<CardShortResponse> getAllByUserId(@PathVariable Long targetUserId) {
-        return cardService.getAllByUserId(targetUserId).stream()
+    public ResponseEntity<ApiResponse<List<CardShortResponse>>> getAllByUserId(@PathVariable Long targetUserId) {
+        List<CardShortResponse> cardShortResponseList = cardService.getAllByUserId(targetUserId).stream()
                 .map(cardMapper::toShort)
                 .toList();
+
+        return ApiResponseFactory.ok(cardShortResponseList);
     }
 
     @PostMapping
-    public CardLongResponse add(@Valid @RequestBody CardCreateRequest request) {
+    public ResponseEntity<ApiResponse<CardLongResponse>> add(@Valid @RequestBody CardCreateRequest request) {
         Card card = cardMapper.fromCreate(request);
-        return cardMapper.toLong(cardService.add(card));
+        CardLongResponse cardLongResponse = cardMapper.toLong(cardService.add(card));
+        return ApiResponseFactory.ok("Card added successfully.", cardLongResponse);
     }
 
     @PatchMapping("/{targetCardId}/activate")
-    public void activate(@PathVariable Long targetCardId) {
+    public ResponseEntity<ApiResponse<Void>> activate(@PathVariable Long targetCardId) {
         cardService.activate(targetCardId);
+        return ApiResponseFactory.noContent("Card activated successfully.");
     }
 
     @PatchMapping("/{targetCardId}/deactivate")
-    public void deactivate(@PathVariable Long targetCardId) {
+    public ResponseEntity<ApiResponse<Void>> deactivate(@PathVariable Long targetCardId) {
         cardService.deactivate(targetCardId);
+        return ApiResponseFactory.noContent("Card deactivated successfully.");
     }
 
     @DeleteMapping("/{targetCardId}")
-    public void remove(@PathVariable Long targetCardId) {
+    public ResponseEntity<ApiResponse<Void>> remove(@PathVariable Long targetCardId) {
         cardService.remove(targetCardId);
+        return ApiResponseFactory.noContent("Card deactivated successfully.");
     }
 }

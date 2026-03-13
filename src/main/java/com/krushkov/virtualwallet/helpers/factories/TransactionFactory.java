@@ -1,4 +1,4 @@
-package com.krushkov.virtualwallet.helpers;
+package com.krushkov.virtualwallet.helpers.factories;
 
 import com.krushkov.virtualwallet.models.Currency;
 import com.krushkov.virtualwallet.models.Transaction;

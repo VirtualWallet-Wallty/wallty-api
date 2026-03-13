@@ -2,7 +2,7 @@ package com.krushkov.virtualwallet.security.exceptions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.krushkov.virtualwallet.helpers.ValidationMessages;
-import com.krushkov.virtualwallet.models.dtos.responses.api.ApiErrorResponse;
+import com.krushkov.virtualwallet.models.dtos.responses.api.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,15 +25,14 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
             HttpServletResponse response,
             AccessDeniedException accessDeniedException
     ) throws IOException {
-        ApiErrorResponse errorResponse =
-                ApiErrorResponse.error(
-                        HttpStatus.FORBIDDEN.value(),
-                        request.getRequestURI(),
-                        ValidationMessages.API_ACCESS_ERROR
-                );
+        ApiResponse<Void> apiResponse = ApiResponse.error(
+                request.getRequestURI(),
+                ValidationMessages.API_ACCESS_ERROR,
+                null
+        );
 
         response.setStatus(HttpStatus.FORBIDDEN.value());
-        response.setContentType("application/json");
-        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
     }
 }

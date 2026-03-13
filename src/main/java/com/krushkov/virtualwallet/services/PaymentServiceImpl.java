@@ -1,6 +1,5 @@
 package com.krushkov.virtualwallet.services;
 
-import com.krushkov.virtualwallet.helpers.validations.UserValidations;
 import com.krushkov.virtualwallet.models.Transaction;
 import com.krushkov.virtualwallet.models.Wallet;
 import com.krushkov.virtualwallet.models.dtos.requests.PaymentRequest;
@@ -8,7 +7,7 @@ import com.krushkov.virtualwallet.security.auth.PrincipalContext;
 import com.krushkov.virtualwallet.services.contacts.PaymentService;
 import com.krushkov.virtualwallet.services.contacts.TransactionService;
 import com.krushkov.virtualwallet.services.contacts.WalletService;
-import com.krushkov.virtualwallet.helpers.TransactionFactory;
+import com.krushkov.virtualwallet.helpers.factories.TransactionFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
