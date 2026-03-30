@@ -24,5 +24,6 @@ public interface CardMapper {
     @Mapping(target = "ownerId", source = "user.id")
     CardShortResponse toShort(Card card);
 
-     CardLongResponse toLong(Card card);
+    @Mapping(target = "owner", source = "user")
+    CardLongResponse toLong(Card card);
 }
