@@ -4,6 +4,7 @@ import com.krushkov.virtualwallet.exceptions.InvalidOperationException;
 import com.krushkov.virtualwallet.helpers.ValidationMessages;
 import com.krushkov.virtualwallet.helpers.mappers.UserMapper;
 import com.krushkov.virtualwallet.models.dtos.responses.auth.UserPrincipalResponse;
+import com.krushkov.virtualwallet.security.auth.PrincipalContext;
 import com.krushkov.virtualwallet.security.auth.UserPrincipal;
 import com.krushkov.virtualwallet.security.jwt.JwtCookieUtil;
 import com.krushkov.virtualwallet.security.jwt.JwtUtil;
@@ -74,5 +75,16 @@ public class AuthServiceImpl implements AuthService {
     public void logout(HttpServletResponse response) {
         jwtCookieUtil.clearTokenCookie(response);
         SecurityContextHolder.clearContext();
+    }
+
+    @Override
+    public UserPrincipalResponse getMe() {
+        UserPrincipal userPrincipal = PrincipalContext.getPrincipal();
+        return new UserPrincipalResponse(
+                userPrincipal.getId(),
+                userPrincipal.getUsername(),
+                userPrincipal.getRole().name(),
+                userPrincipal.isBlocked()
+        );
     }
 }

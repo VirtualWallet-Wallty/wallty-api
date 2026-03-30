@@ -26,7 +26,7 @@ public final class PrincipalContext {
         return getPrincipal().getRole() == RoleType.ADMIN;
     }
 
-    private static UserPrincipal getPrincipal() {
+    public static UserPrincipal getPrincipal() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null
