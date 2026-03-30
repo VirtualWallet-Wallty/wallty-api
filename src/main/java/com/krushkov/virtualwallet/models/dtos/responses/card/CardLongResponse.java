@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 public record CardLongResponse(
         Long id,
-        UserShortResponse user,
+        UserShortResponse owner,
 
         String cardHolder,
         String cardSuffix,

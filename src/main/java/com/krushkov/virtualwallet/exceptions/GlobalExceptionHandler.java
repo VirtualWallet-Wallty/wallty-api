@@ -69,10 +69,10 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.NOT_FOUND, request, "Endpoint not found.");
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleUnexpected(HttpServletRequest request) {
-        return error(HttpStatus.INTERNAL_SERVER_ERROR, request, "Unexpected server error.");
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ApiResponse<Void>> handleUnexpected(HttpServletRequest request) {
+//        return error(HttpStatus.INTERNAL_SERVER_ERROR, request, "Unexpected server error.");
+//    }
 
     private ResponseEntity<ApiResponse<Void>> error(HttpStatus status, HttpServletRequest request, String message) {
         return ResponseEntity

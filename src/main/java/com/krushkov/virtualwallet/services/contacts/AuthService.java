@@ -13,4 +13,6 @@ public interface AuthService {
     UserPrincipalResponse login(LoginRequest request, HttpServletResponse response);
 
     void logout(HttpServletResponse response);
+
+    UserPrincipalResponse getMe();
 }
