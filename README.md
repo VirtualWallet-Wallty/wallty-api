@@ -6,6 +6,10 @@ Developing a secure web application for digital wallet management, enabling seam
 
 # Latest updates:
 ```
+Log #8:
+- Add CurrencyController and CurrencyService to be able to retrieve currency data from the api.
+```
+```
 Log #7:
 - Fix ApiResponse. Every response from backend now returns a uniform structure. 
 - Fix pay and transfer method namings in the controllers.  

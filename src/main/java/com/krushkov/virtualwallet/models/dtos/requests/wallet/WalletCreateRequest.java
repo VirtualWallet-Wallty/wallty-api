@@ -10,7 +10,7 @@ public record WalletCreateRequest(
         @Size(min = 3, max = 50, message = ValidationMessages.WALLET_NAME_LENGTH_ERROR)
         String name,
 
-        @NotBlank(message = ValidationMessages.WALLET_CURRENCY_CODE_NOT_NULL_ERROR)
-        @Size(min = 3, max = 3, message = ValidationMessages.WALLET_CURRENCY_CODE_LENGTH_ERROR)
+        @NotBlank(message = ValidationMessages.CURRENCY_CODE_NOT_NULL_ERROR)
+        @Size(min = 3, max = 3, message = ValidationMessages.CURRENCY_CODE_LENGTH_ERROR)
         String currencyCode
 ) {}
