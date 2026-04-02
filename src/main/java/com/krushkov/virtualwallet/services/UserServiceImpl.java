@@ -34,7 +34,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public User getById(Long targetUserId) {
-        UserValidations.validateIsAdmin();
         return userRepository.findByIdAndIsDeletedFalse(targetUserId)
                 .orElseThrow(() -> new EntityNotFoundException("User", targetUserId));
     }

@@ -37,16 +37,27 @@ public final class ValidationMessages {
 
     public final static String CARD_EXPIRED_ERROR = "Card is expired.";
 
+    // Currency request errors
+    public final static String CURRENCY_CODE_NOT_NULL_ERROR = "Currency code is required.";
+    public final static String CURRENCY_NAME_NOT_NULL_ERROR = "Currency name is required.";
+    public final static String CURRENCY_SYMBOL_NOT_NULL_ERROR = "Currency symbol is required.";
+    public final static String CURRENCY_DECIMALS_NOT_NULL_ERROR = "Currency decimals is required.";
+
+    public final static String CURRENCY_CODE_LENGTH_ERROR = "Currency code must be {max} symbols (ISO 4217).";
+    public final static String CURRENCY_NAME_LENGTH_ERROR = "Currency name cannot be greater that {max} symbols.";
+    public final static String CURRENCY_SYMBOL_LENGTH_ERROR =
+            "Currency symbol cannot be greater than {max} characters.";
+    public final static String CURRENCY_MIN_DECIMALS_LENGTH_ERROR = "Currency decimals must be positive.";
+    public final static String CURRENCY_MAX_DECIMALS_LENGTH_ERROR =
+            "Currency decimals cannot be grater than 10 digits.";
+
     // Transaction request errors
     public final static String TRANSACTION_CREATE_RANGE_ERROR = "Created from must be before or equal to created to.";
     public final static String TRANSACTION_AMOUNT_RANGE_ERROR = "Min amount must be less than or equal to max amount.";
 
     // Wallet request errors
     public final static String WALLET_NAME_NOT_NULL_ERROR = "Password is required.";
-    public final static String WALLET_CURRENCY_CODE_NOT_NULL_ERROR = "Password is required.";
-
     public final static String WALLET_NAME_LENGTH_ERROR = "Wallet name must be between {min} and {max} symbols.";
-    public final static String WALLET_CURRENCY_CODE_LENGTH_ERROR = "Currency code must be {max} symbols.";
     public final static String WALLET_USER_ID_LENGTH_ERROR = "User Id must be positive.";
     public final static String WALLET_MIN_BALANCE_LENGTH_ERROR = "Minimal balance must be positive or zero.";
     public final static String WALLET_MAX_BALANCE_LENGTH_ERROR = "Maximal balance must be positive or zero.";
