@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record TransactionFilterOptions(
+        String label,
+
         Long senderId,
         Long recipientId,
 
@@ -42,6 +44,7 @@ public record TransactionFilterOptions(
 
     public TransactionFilterOptions withoutUserId() {
         return new TransactionFilterOptions(
+                label,
                 null,
                 null,
                 senderWalletId,

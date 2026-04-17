@@ -96,6 +96,7 @@ CREATE TABLE cards
 CREATE TABLE transactions
 (
     transaction_id      BIGINT         NOT NULL UNIQUE PRIMARY KEY AUTO_INCREMENT,
+    label               VARCHAR(20)    NULL,
 
     type                VARCHAR(20)    NOT NULL,
     status              VARCHAR(20)    NOT NULL,

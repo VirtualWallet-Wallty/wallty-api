@@ -39,6 +39,8 @@ public interface WalletRepository
             """)
     Optional<Wallet> findWithLockByIdAndIsDeletedFalse(Long walletId);
 
+    int countByUserIdAndIsDeletedFalse(Long userId);
+
     boolean existsByNameAndUserIdAndIsDeletedFalse(String cardName, Long userId);
 
 }

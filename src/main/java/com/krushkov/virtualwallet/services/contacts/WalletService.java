@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface WalletService {
 
+    Page<Wallet> search(WalletFilterOptions filters, Pageable pageable);
+
     Wallet getById(Long targetWalletId);
 
     Wallet getByIdAndUserId(Long targetWalletId, Long targetUserId);
@@ -18,13 +20,13 @@ public interface WalletService {
 
     Wallet getMyDefault();
 
-    List<Wallet> getAllByUserId(Long targetUserId);
-
     List<Wallet> getMyAll();
 
-    Page<Wallet> search(WalletFilterOptions filters, Pageable pageable);
+    List<Wallet> getAllByUserId(Long targetUserId);
 
-    Wallet create(Wallet wallet);
+    Wallet create(Wallet wallet, String currencyCode);
+
+    void delete(Long targetWalletId);
 
     void setDefault(Long targetWalletId);
 

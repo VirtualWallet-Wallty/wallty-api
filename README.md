@@ -6,6 +6,14 @@ Developing a secure web application for digital wallet management, enabling seam
 
 # Latest updates:
 ```
+Log #9:
+- Fix api response to be suitasble for android client.
+- Add label to transaction models.
+- Update transaction search for the new label field. 
+- Add wallet delete endpoind.
+- Update wallet create and delete rules. Wallets count have to be between 1 and 5 now. 
+```
+```
 Log #8:
 - Add CurrencyController and CurrencyService to be able to retrieve currency data from the api.
 ```

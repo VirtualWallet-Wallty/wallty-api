@@ -26,6 +26,9 @@ public class Transaction {
     @Column(name = "transaction_id")
     private Long id;
 
+    @Column(name = "label", nullable = false, length = 20)
+    private String label;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 20)
     private TransactionType type;
