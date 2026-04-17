@@ -40,6 +40,7 @@ public class TransactionController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<TransactionShortResponse>>> search(
+            @RequestParam(required = false) String label,
             @RequestParam(required = false) Long senderId,
             @RequestParam(required = false) Long recipientId,
             @RequestParam(required = false) Long senderWalletId,
@@ -53,6 +54,7 @@ public class TransactionController {
             Pageable pageable
     ) {
         TransactionFilterOptions filters = new TransactionFilterOptions(
+                label,
                 senderId, recipientId,
                 senderWalletId, recipientWalletId,
                 type, status,

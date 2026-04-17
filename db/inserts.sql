@@ -56,15 +56,15 @@ VALUES
     (4, '9999',  1, 2030, 'Admin Root',    'ACTIVE');
 
 INSERT INTO transactions
-(type, status, amount, currency_code,
+(label, type, status, amount, currency_code,
  sender_wallet_id, recipient_wallet_id,
  sender_id, recipient_id, external_reference)
 VALUES
-    ('TOP_UP',   'CONFIRMED', 200.00, 'EUR', NULL, 1, NULL, 1, 'TOPUP-IVAN-001'),
-    ('TOP_UP',   'CONFIRMED', 300.00, 'EUR', NULL, 3, NULL, 2, 'TOPUP-MARIA-001'),
+    (NULL, 'TOP_UP',   'CONFIRMED', 200.00, 'EUR', NULL, 1, NULL, 1, 'TOPUP-IVAN-001'),
+    (NULL, 'TOP_UP',   'CONFIRMED', 300.00, 'EUR', NULL, 3, NULL, 2, 'TOPUP-MARIA-001'),
 
-    ('TRANSFER', 'CONFIRMED', 50.00,  'EUR', 1, 3, 1, 2, 'TX-IVAN-MARIA-001'),
-    ('TRANSFER', 'CONFIRMED', 75.00,  'EUR', 3, 5, 2, 3, 'TX-MARIA-GEORGI-001'),
+    ('For Caffe', 'TRANSFER', 'CONFIRMED', 50.00,  'EUR', 1, 3, 1, 2, 'TX-IVAN-MARIA-001'),
+    (NULL, 'TRANSFER', 'CONFIRMED', 75.00,  'EUR', 3, 5, 2, 3, 'TX-MARIA-GEORGI-001'),
 
-    ('PAYMENT',  'CONFIRMED', 20.00,  'BGN', 5, NULL, 3, NULL, 'PAY-GEORGI-001'),
-    ('PAYMENT',  'CONFIRMED', 100.00, 'EUR', 6, NULL, 4, NULL, 'PAY-ADMIN-001');
+    ('Apple Inc.', 'PAYMENT',  'CONFIRMED', 20.00,  'BGN', 5, NULL, 3, NULL, 'PAY-GEORGI-001'),
+    ('Adobe' ,'PAYMENT',  'CONFIRMED', 100.00, 'EUR', 6, NULL, 4, NULL, 'PAY-ADMIN-001');

@@ -1,9 +1,12 @@
 package com.krushkov.virtualwallet.services;
 
 import com.krushkov.virtualwallet.exceptions.EntityNotFoundException;
+import com.krushkov.virtualwallet.exceptions.InvalidOperationException;
+import com.krushkov.virtualwallet.helpers.ValidationMessages;
 import com.krushkov.virtualwallet.helpers.validations.TransactionValidations;
 import com.krushkov.virtualwallet.helpers.validations.UserValidations;
 import com.krushkov.virtualwallet.helpers.validations.WalletValidations;
+import com.krushkov.virtualwallet.models.Currency;
 import com.krushkov.virtualwallet.models.User;
 import com.krushkov.virtualwallet.models.Wallet;
 import com.krushkov.virtualwallet.models.dtos.requests.wallet.WalletFilterOptions;
@@ -11,6 +14,7 @@ import com.krushkov.virtualwallet.repositories.UserRepository;
 import com.krushkov.virtualwallet.repositories.WalletRepository;
 import com.krushkov.virtualwallet.repositories.specifications.WalletSpecifications;
 import com.krushkov.virtualwallet.security.auth.PrincipalContext;
+import com.krushkov.virtualwallet.services.contacts.CurrencyService;
 import com.krushkov.virtualwallet.services.contacts.UserService;
 import com.krushkov.virtualwallet.services.contacts.WalletService;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +31,16 @@ import java.util.List;
 public class WalletServiceImpl implements WalletService {
 
     private final WalletRepository walletRepository;
+    private final CurrencyService currencyService;
     private final UserService userService;
     private final UserRepository userRepository;
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Wallet> search(WalletFilterOptions filters, Pageable pageable) {
+        UserValidations.validateIsAdmin();
+        return walletRepository.findAll(WalletSpecifications.withFilters(filters), pageable);
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -65,13 +77,6 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Wallet> getAllByUserId(Long userId) {
-        UserValidations.validateIsAdmin();
-        return walletRepository.findAllByUserIdAndIsDeletedFalse(userId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<Wallet> getMyAll() {
         UserValidations.validateIsNotAdmin();
         return walletRepository.findAllByUserIdAndIsDeletedFalse(PrincipalContext.getId());
@@ -79,22 +84,43 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Wallet> search(WalletFilterOptions filters, Pageable pageable) {
+    public List<Wallet> getAllByUserId(Long userId) {
         UserValidations.validateIsAdmin();
-        return walletRepository.findAll(WalletSpecifications.withFilters(filters), pageable);
+        return walletRepository.findAllByUserIdAndIsDeletedFalse(userId);
     }
 
     @Override
     @Transactional
-    public Wallet create(Wallet wallet) {
+    public Wallet create(Wallet wallet, String currencyCode) {
         UserValidations.validateIsNotAdmin();
 
         Long principalId = PrincipalContext.getId();
+
+        WalletValidations.validateMaxWalletCount(walletRepository, principalId);
         WalletValidations.validateNameExists(walletRepository, wallet.getName(), principalId);
+
         User user = userService.getById(principalId);
+        Currency currency = currencyService.getByCode(currencyCode);
 
         wallet.setUser(user);
+        wallet.setCurrency(currency);
+
         return walletRepository.save(wallet);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long targetWalletId) {
+        UserValidations.validateIsNotAdmin();
+        Long principalId = PrincipalContext.getId();
+
+        Wallet targetWallet = getByIdAndUserId(targetWalletId, principalId);
+        WalletValidations.validateMinWalletCount(walletRepository, principalId);
+
+        WalletValidations.validateAlreadyDefault(targetWallet);
+        WalletValidations.validateBalanceEmpty(targetWallet);
+
+        targetWallet.setDeleted(true);
     }
 
     @Override
@@ -132,7 +158,6 @@ public class WalletServiceImpl implements WalletService {
         UserValidations.validateIsNotAdmin();
         UserValidations.validateRecipientNotBlocked(userRepository, recipientId);
         UserValidations.validateRecipientNotAdmin(userRepository, recipientId);
-
 
         Wallet targetWallet = lockWalletOwnedByUser(targetWalletId, recipientId);
 

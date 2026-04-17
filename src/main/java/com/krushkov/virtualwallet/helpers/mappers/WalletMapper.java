@@ -17,6 +17,7 @@ public interface WalletMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "balance", ignore = true)
     @Mapping(target = "default", ignore = true)
+    @Mapping(target = "currency", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

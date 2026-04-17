@@ -15,7 +15,7 @@ public record CurrencyCreateRequest(
         @NotBlank(message = ValidationMessages.CURRENCY_NAME_NOT_NULL_ERROR)
         String name,
 
-        @Size(min = 6, max = 100, message = ValidationMessages.CARD_HOLDER_LENGTH_ERROR)
+        @Size(min = 6, max = 100, message = ValidationMessages.CURRENCY_SYMBOL_LENGTH_ERROR)
         @NotBlank(message = ValidationMessages.CURRENCY_SYMBOL_NOT_NULL_ERROR)
         String symbol,
 

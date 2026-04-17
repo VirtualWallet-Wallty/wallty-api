@@ -35,6 +35,13 @@ public final class TransactionSpecifications {
 
             List<Predicate> predicates = new ArrayList<>();
 
+            if (filters.label() != null) {
+                predicates.add(cb.like(
+                        cb.lower(root.get("label")),
+                        "%" + filters.label().toLowerCase() + "%"
+                ));
+            }
+
             if (filters.senderWalletId() != null) {
                 predicates.add(cb.equal(root.get("senderWallet").get("id"), filters.senderWalletId()));
             }

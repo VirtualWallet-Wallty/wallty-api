@@ -31,36 +31,6 @@ public class WalletController {
     private final WalletService walletService;
     private final WalletMapper walletMapper;
 
-    @GetMapping("/{targetWalletId}")
-    public ResponseEntity<ApiResponse<WalletLongResponse>> getById(@PathVariable Long targetWalletId) {
-        WalletLongResponse walletLongResponse = walletMapper.toLong(walletService.getById(targetWalletId));
-        return ApiResponseFactory.ok(walletLongResponse);
-    }
-
-    @GetMapping("/default")
-    public ResponseEntity<ApiResponse<WalletLongResponse>> getMyDefault() {
-        WalletLongResponse walletLongResponse = walletMapper.toLong(walletService.getMyDefault());
-        return ApiResponseFactory.ok(walletLongResponse);
-    }
-
-    @GetMapping("/users/{targetUserId}")
-    public ResponseEntity<ApiResponse<List<WalletShortResponse>>> getAllByUserId(@PathVariable Long targetUserId) {
-        List<WalletShortResponse> walletShortResponseList = walletService.getAllByUserId(targetUserId).stream()
-                .map(walletMapper::toShort)
-                .toList();
-
-        return ApiResponseFactory.ok(walletShortResponseList);
-    }
-
-    @GetMapping("/my")
-    public ResponseEntity<ApiResponse<List<WalletShortResponse>>> getMyAll() {
-        List<WalletShortResponse> walletShortResponseList = walletService.getMyAll().stream()
-                .map(walletMapper::toShort)
-                .toList();
-
-        return ApiResponseFactory.ok(walletShortResponseList);
-    }
-
     @GetMapping
     public ResponseEntity<ApiResponse<Page<WalletShortResponse>>> search(
             @RequestParam(required = false) Long userId,
@@ -81,9 +51,39 @@ public class WalletController {
         return ApiResponseFactory.ok(walletShortResponsePage);
     }
 
+    @GetMapping("/{targetWalletId}")
+    public ResponseEntity<ApiResponse<WalletLongResponse>> getById(@PathVariable Long targetWalletId) {
+        WalletLongResponse walletLongResponse = walletMapper.toLong(walletService.getById(targetWalletId));
+        return ApiResponseFactory.ok(walletLongResponse);
+    }
+
+    @GetMapping("/default")
+    public ResponseEntity<ApiResponse<WalletLongResponse>> getMyDefault() {
+        WalletLongResponse walletLongResponse = walletMapper.toLong(walletService.getMyDefault());
+        return ApiResponseFactory.ok(walletLongResponse);
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<ApiResponse<List<WalletShortResponse>>> getMyAll() {
+        List<WalletShortResponse> walletShortResponseList = walletService.getMyAll().stream()
+                .map(walletMapper::toShort)
+                .toList();
+
+        return ApiResponseFactory.ok(walletShortResponseList);
+    }
+
+    @GetMapping("/users/{targetUserId}")
+    public ResponseEntity<ApiResponse<List<WalletShortResponse>>> getAllByUserId(@PathVariable Long targetUserId) {
+        List<WalletShortResponse> walletShortResponseList = walletService.getAllByUserId(targetUserId).stream()
+                .map(walletMapper::toShort)
+                .toList();
+
+        return ApiResponseFactory.ok(walletShortResponseList);
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<WalletLongResponse>> create(@Valid @RequestBody WalletCreateRequest request) {
-        Wallet wallet = walletService.create(walletMapper.fromCreate(request));
+        Wallet wallet = walletService.create(walletMapper.fromCreate(request), request.currencyCode());
         WalletLongResponse walletLongResponse = walletMapper.toLong(wallet);
 
         return ApiResponseFactory.ok("Wallet created successfully.", walletLongResponse);
@@ -94,5 +94,12 @@ public class WalletController {
         walletService.setDefault(targetWalletId);
 
         return ApiResponseFactory.noContent("Wallet set default successfully.");
+    }
+
+    @DeleteMapping("/{targetWalletId}")
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long targetWalletId) {
+        walletService.delete(targetWalletId);
+
+        return ApiResponseFactory.noContent("Wallet deleted successfully.");
     }
 }

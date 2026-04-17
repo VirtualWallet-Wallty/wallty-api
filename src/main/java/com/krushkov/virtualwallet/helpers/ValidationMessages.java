@@ -93,6 +93,9 @@ public final class ValidationMessages {
     // Wallet validation errors
     public static final String WALLET_NAME_ALREADY_EXISTS_ERROR = "User already have wallet with the same name.";
     public static final String WALLET_ALREADY_DEFAULT_ERROR = "This wallet is already default.";
+    public static final String WALLET_BALANCE_NOT_EMPTY_ERROR = "Wallet is not empty.";
+    public static final String WALLET_MAX_COUNT_ERROR = "You cannot have more than %d wallets.";
+    public static final String WALLET_MIN_COUNT_ERROR = "You cannot have less than %d wallet.";
 
     // Api access errors
     public static final String API_ACCESS_ERROR = "You are not allowed to access this resource.";

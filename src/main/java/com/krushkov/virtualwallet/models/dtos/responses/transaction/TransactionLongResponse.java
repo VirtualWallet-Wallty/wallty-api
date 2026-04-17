@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 public record TransactionLongResponse(
         Long id,
+        String label,
 
         TransactionType type,
         TransactionStatus status,
