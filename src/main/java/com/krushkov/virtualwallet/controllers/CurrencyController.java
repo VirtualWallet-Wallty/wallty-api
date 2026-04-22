@@ -7,7 +7,7 @@ import com.krushkov.virtualwallet.models.dtos.requests.currency.CurrencyCreateRe
 import com.krushkov.virtualwallet.models.dtos.responses.api.ApiResponse;
 import com.krushkov.virtualwallet.models.dtos.responses.currency.CurrencyLongResponse;
 import com.krushkov.virtualwallet.models.dtos.responses.currency.CurrencyShortResponse;
-import com.krushkov.virtualwallet.services.contacts.CurrencyService;
+import com.krushkov.virtualwallet.services.contracts.CurrencyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +23,6 @@ public class CurrencyController {
     private final CurrencyService currencyService;
     private final CurrencyMapper currencyMapper;
 
-    @GetMapping("/{targetCurrencyCode}")
-    public ResponseEntity<ApiResponse<CurrencyLongResponse>> getByCode(@PathVariable String code) {
-        CurrencyLongResponse currencyLongResponse = currencyMapper.toLong(currencyService.getByCode(code));
-        return ApiResponseFactory.ok(currencyLongResponse);
-    }
-
     @GetMapping
     public ResponseEntity<ApiResponse<List<CurrencyShortResponse>>> getAllActive() {
         List<CurrencyShortResponse> currencyShortResponseList = currencyService.getAllActive().stream()
@@ -36,6 +30,14 @@ public class CurrencyController {
                 .toList();
 
         return ApiResponseFactory.ok(currencyShortResponseList);
+    }
+
+    @GetMapping("/{targetCurrencyCode}")
+    public ResponseEntity<ApiResponse<CurrencyLongResponse>> getByCode(@PathVariable String targetCurrencyCode) {
+        CurrencyLongResponse currencyLongResponse = currencyMapper
+                .toLong(currencyService.getByCode(targetCurrencyCode));
+
+        return ApiResponseFactory.ok(currencyLongResponse);
     }
 
     @PostMapping

@@ -37,7 +37,7 @@ CREATE TABLE users
 
 CREATE TABLE currencies
 (
-    currency_code CHAR(3)     NOT NULL UNIQUE PRIMARY KEY,
+    currency_code VARCHAR(3)  NOT NULL UNIQUE PRIMARY KEY,
     name          VARCHAR(50) NOT NULL,
     symbol        VARCHAR(5)  NOT NULL,
     decimals      INT         NOT NULL DEFAULT 2,
@@ -51,7 +51,7 @@ CREATE TABLE wallets
 
     name          VARCHAR(50)    NOT NULL,
     balance       DECIMAL(19, 2) NOT NULL DEFAULT 0.00,
-    currency_code CHAR(3)        NOT NULL DEFAULT 'EUR',
+    currency_code VARCHAR(3)     NOT NULL,
 
     is_default    BOOLEAN        NOT NULL DEFAULT FALSE,
     version       BIGINT         NOT NULL DEFAULT 0,
@@ -93,34 +93,57 @@ CREATE TABLE cards
     CHECK ( status IN ('ACTIVE', 'USER_DEACTIVATED', 'ADMIN_DEACTIVATED') )
 );
 
+CREATE TABLE exchange_rates
+(
+    exchange_rate_id   BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    from_currency_code VARCHAR(3)     NOT NULL,
+    to_currency_code   VARCHAR(3)     NOT NULL,
+
+    rate               DECIMAL(19, 8) NOT NULL,
+    last_updated       TIMESTAMP      NOT NULL,
+
+    CONSTRAINT fk_er_from_currency FOREIGN KEY (from_currency_code) REFERENCES currencies (currency_code)
+        ON DELETE RESTRICT ON UPDATE RESTRICT,
+
+    CONSTRAINT fk_er_to_currency FOREIGN KEY (to_currency_code) REFERENCES currencies (currency_code)
+        ON DELETE RESTRICT ON UPDATE RESTRICT,
+
+    CONSTRAINT uq_exchange UNIQUE (from_currency_code, to_currency_code),
+
+    CHECK ( rate > 0 )
+);
+
 CREATE TABLE transactions
 (
-    transaction_id      BIGINT         NOT NULL UNIQUE PRIMARY KEY AUTO_INCREMENT,
-    label               VARCHAR(20)    NULL,
+    transaction_id          BIGINT         NOT NULL UNIQUE PRIMARY KEY AUTO_INCREMENT,
+    label                   VARCHAR(50)    NULL,
 
-    type                VARCHAR(20)    NOT NULL,
-    status              VARCHAR(20)    NOT NULL,
+    type                    VARCHAR(20)    NOT NULL,
+    status                  VARCHAR(20)    NOT NULL,
 
-    amount              DECIMAL(19, 2) NOT NULL,
-    currency_code       CHAR(3)        NOT NULL,
+    sender_amount           DECIMAL(19, 2) NOT NULL,
+    sender_currency_code    VARCHAR(3)     NOT NULL,
 
-    sender_id           BIGINT         NULL,
-    recipient_id        BIGINT         NULL,
+    recipient_amount        DECIMAL(19, 2) NOT NULL,
+    recipient_currency_code VARCHAR(3)     NOT NULL,
 
-    sender_wallet_id    BIGINT         NULL,
-    recipient_wallet_id BIGINT         NULL,
+    exchange_rate           DECIMAL(19, 8) NOT NULL,
 
-    external_reference  VARCHAR(255)   NULL,
+    sender_id               BIGINT         NULL,
+    sender_wallet_id        BIGINT         NULL,
 
-    created_at          TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    recipient_id            BIGINT         NULL,
+    recipient_wallet_id     BIGINT         NULL,
 
-    CONSTRAINT fk_tx_currencies FOREIGN KEY (currency_code) REFERENCES currencies (currency_code)
+    external_reference      VARCHAR(255)   NULL UNIQUE,
+
+    created_at              TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_tx_sender_currency FOREIGN KEY (sender_currency_code) REFERENCES currencies (currency_code)
         ON DELETE RESTRICT ON UPDATE RESTRICT,
 
-    CONSTRAINT fk_tx_sender_wallet FOREIGN KEY (sender_wallet_id) REFERENCES wallets (wallet_id)
-        ON DELETE RESTRICT ON UPDATE RESTRICT,
-
-    CONSTRAINT fk_tx_recipient_wallet FOREIGN KEY (recipient_wallet_id) REFERENCES wallets (wallet_id)
+    CONSTRAINT fk_tx_recipient_currency FOREIGN KEY (recipient_currency_code) REFERENCES currencies (currency_code)
         ON DELETE RESTRICT ON UPDATE RESTRICT,
 
     CONSTRAINT fk_tx_sender_user FOREIGN KEY (sender_id) REFERENCES users (user_id)
@@ -129,10 +152,21 @@ CREATE TABLE transactions
     CONSTRAINT fk_tx_recipient_user FOREIGN KEY (recipient_id) REFERENCES users (user_id)
         ON DELETE RESTRICT ON UPDATE RESTRICT,
 
+    CONSTRAINT fk_tx_sender_wallet FOREIGN KEY (sender_wallet_id) REFERENCES wallets (wallet_id)
+        ON DELETE RESTRICT ON UPDATE RESTRICT,
+
+    CONSTRAINT fk_tx_recipient_wallet FOREIGN KEY (recipient_wallet_id) REFERENCES wallets (wallet_id)
+        ON DELETE RESTRICT ON UPDATE RESTRICT,
+
     CHECK ( type IN ('TRANSFER', 'TOP_UP', 'PAYMENT') ),
     CHECK ( status IN ('PENDING', 'CONFIRMED', 'FAILED', 'REJECTED') ),
-    CHECK ( amount > 0 )
+    CHECK ( sender_amount > 0 ),
+    CHECK ( recipient_amount > 0 ),
+    CHECK ( exchange_rate > 0 )
 );
+
+CREATE INDEX idx_exchange_from ON exchange_rates (from_currency_code);
+CREATE INDEX idx_exchange_to ON exchange_rates (to_currency_code);
 
 CREATE INDEX idx_tx_created_at ON transactions (created_at);
 
@@ -144,5 +178,3 @@ CREATE INDEX idx_tx_recipient_user ON transactions (recipient_id);
 
 CREATE INDEX idx_tx_type ON transactions (type);
 CREATE INDEX idx_tx_status ON transactions (status);
-
-CREATE UNIQUE INDEX uq_tx_external_ref ON transactions (external_reference);

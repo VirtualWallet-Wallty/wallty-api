@@ -23,7 +23,7 @@ public final class ApiResponseFactory {
 
     public static ResponseEntity<ApiResponse<Void>> noContent(String message) {
         return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
+                .status(HttpStatus.OK)
                 .body(ApiResponse.success(message, null));
     }
 }

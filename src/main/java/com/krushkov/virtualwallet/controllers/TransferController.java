@@ -5,10 +5,10 @@ import com.krushkov.virtualwallet.helpers.mappers.TransactionMapper;
 import com.krushkov.virtualwallet.models.dtos.requests.TransferRequest;
 import com.krushkov.virtualwallet.models.dtos.responses.api.ApiResponse;
 import com.krushkov.virtualwallet.models.dtos.responses.transaction.TransactionLongResponse;
-import com.krushkov.virtualwallet.services.contacts.TransferService;
+import com.krushkov.virtualwallet.security.auth.PrincipalContext;
+import com.krushkov.virtualwallet.services.contracts.TransferService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +25,11 @@ public class TransferController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<TransactionLongResponse>> transfer(@Valid @RequestBody TransferRequest request) {
-        TransactionLongResponse transactionLongResponse = transactionMapper.toLong(transferService.transfer(request));
+        Long userId = PrincipalContext.getId();
+
+        TransactionLongResponse transactionLongResponse = transactionMapper
+                .toLong(transferService.transfer(request), userId);
+
         return ApiResponseFactory.ok("Transfer successful.", transactionLongResponse);
     }
 }

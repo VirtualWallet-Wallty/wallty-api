@@ -13,11 +13,13 @@ public record TransactionShortResponse(
         TransactionType type,
         TransactionStatus status,
 
-        BigDecimal amount,
-        String currencyCode,
+        BigDecimal senderAmount,
+        String senderCurrencyCode,
 
-        Long senderWalletId,
-        Long recipientWalletId,
+        BigDecimal recipientAmount,
+        String recipientCurrencyCode,
+
+        String counterpartyName,
 
         LocalDateTime createdAt
 ) {}

@@ -20,11 +20,19 @@ public record TransactionFilterOptions(
         TransactionType type,
         TransactionStatus status,
 
-        LocalDateTime createdFrom,
-        LocalDateTime createdTo,
+        String senderCurrencyCode,
+        String recipientCurrencyCode,
 
-        BigDecimal minAmount,
-        BigDecimal maxAmount
+        BigDecimal minSenderAmount,
+        BigDecimal maxSenderAmount,
+
+        BigDecimal minRecipientAmount,
+        BigDecimal maxRecipientAmount,
+
+        String externalReference,
+
+        LocalDateTime createdFrom,
+        LocalDateTime createdTo
 ) {
     @AssertTrue(message = ValidationMessages.TRANSACTION_CREATE_RANGE_ERROR)
     public boolean isValidCreateRange() {
@@ -35,11 +43,19 @@ public record TransactionFilterOptions(
     }
 
     @AssertTrue(message = ValidationMessages.TRANSACTION_AMOUNT_RANGE_ERROR)
-    public boolean isValidAmountRange() {
-        if (minAmount == null || maxAmount == null) {
+    public boolean isValidSenderAmountRange() {
+        if (minSenderAmount == null || maxSenderAmount == null) {
             return true;
         }
-        return minAmount.compareTo(maxAmount) <= 0;
+        return minSenderAmount.compareTo(maxSenderAmount) <= 0;
+    }
+
+    @AssertTrue(message = ValidationMessages.TRANSACTION_AMOUNT_RANGE_ERROR)
+    public boolean isValidRecipientAmountRange() {
+        if (minRecipientAmount == null || maxRecipientAmount == null) {
+            return true;
+        }
+        return minRecipientAmount.compareTo(maxRecipientAmount) <= 0;
     }
 
     public TransactionFilterOptions withoutUserId() {
@@ -51,10 +67,15 @@ public record TransactionFilterOptions(
                 recipientWalletId,
                 type,
                 status,
+                senderCurrencyCode,
+                recipientCurrencyCode,
+                minSenderAmount,
+                maxSenderAmount,
+                minRecipientAmount,
+                maxRecipientAmount,
+                externalReference,
                 createdFrom,
-                createdTo,
-                minAmount,
-                maxAmount
+                createdTo
         );
     }
 }

@@ -1,4 +1,4 @@
-package com.krushkov.virtualwallet.services.contacts;
+package com.krushkov.virtualwallet.services.contracts;
 
 import com.krushkov.virtualwallet.models.Wallet;
 import com.krushkov.virtualwallet.models.dtos.requests.wallet.WalletFilterOptions;

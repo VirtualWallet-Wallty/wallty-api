@@ -1,8 +1,7 @@
-package com.krushkov.virtualwallet.services.contacts;
+package com.krushkov.virtualwallet.services.contracts;
 
 import com.krushkov.virtualwallet.models.User;
 import com.krushkov.virtualwallet.models.dtos.requests.auth.LoginRequest;
-import com.krushkov.virtualwallet.models.dtos.requests.auth.RegisterRequest;
 import com.krushkov.virtualwallet.models.dtos.responses.auth.UserPrincipalResponse;
 import jakarta.servlet.http.HttpServletResponse;
 

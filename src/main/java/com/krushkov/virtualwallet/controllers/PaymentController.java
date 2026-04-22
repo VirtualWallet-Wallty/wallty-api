@@ -5,10 +5,10 @@ import com.krushkov.virtualwallet.helpers.mappers.TransactionMapper;
 import com.krushkov.virtualwallet.models.dtos.requests.PaymentRequest;
 import com.krushkov.virtualwallet.models.dtos.responses.api.ApiResponse;
 import com.krushkov.virtualwallet.models.dtos.responses.transaction.TransactionLongResponse;
-import com.krushkov.virtualwallet.services.contacts.PaymentService;
+import com.krushkov.virtualwallet.security.auth.PrincipalContext;
+import com.krushkov.virtualwallet.services.contracts.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +25,11 @@ public class PaymentController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<TransactionLongResponse>> pay(@Valid @RequestBody PaymentRequest request) {
-        TransactionLongResponse transactionLongResponse = transactionMapper.toLong(paymentService.pay(request));
+        Long userId = PrincipalContext.getId();
+
+        TransactionLongResponse transactionLongResponse = transactionMapper
+                .toLong(paymentService.pay(request), userId);
+
         return ApiResponseFactory.ok("Payment successful.", transactionLongResponse);
     }
 }

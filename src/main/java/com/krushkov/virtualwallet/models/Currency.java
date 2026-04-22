@@ -17,7 +17,7 @@ public class Currency {
 
     @Id
     @EqualsAndHashCode.Include
-    @Column(name = "currency_code", length = 3, columnDefinition = "CHAR(3)")
+    @Column(name = "currency_code", length = 3)
     private String code;
 
     @Column(name = "name", nullable = false, length = 50)

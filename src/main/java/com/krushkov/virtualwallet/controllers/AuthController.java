@@ -7,12 +7,10 @@ import com.krushkov.virtualwallet.models.dtos.requests.auth.LoginRequest;
 import com.krushkov.virtualwallet.models.dtos.requests.auth.RegisterRequest;
 import com.krushkov.virtualwallet.models.dtos.responses.api.ApiResponse;
 import com.krushkov.virtualwallet.models.dtos.responses.auth.UserPrincipalResponse;
-import com.krushkov.virtualwallet.services.contacts.AuthService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.krushkov.virtualwallet.services.contracts.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -14,7 +14,7 @@ import com.krushkov.virtualwallet.repositories.RoleRepository;
 import com.krushkov.virtualwallet.repositories.UserRepository;
 import com.krushkov.virtualwallet.repositories.specifications.UserSpecifications;
 import com.krushkov.virtualwallet.security.auth.PrincipalContext;
-import com.krushkov.virtualwallet.services.contacts.UserService;
+import com.krushkov.virtualwallet.services.contracts.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

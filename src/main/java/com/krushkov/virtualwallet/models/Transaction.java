@@ -26,7 +26,7 @@ public class Transaction {
     @Column(name = "transaction_id")
     private Long id;
 
-    @Column(name = "label", nullable = false, length = 20)
+    @Column(name = "label", length = 50)
     private String label;
 
     @Enumerated(EnumType.STRING)
@@ -37,12 +37,22 @@ public class Transaction {
     @Column(name = "status", nullable = false, length = 20)
     private TransactionStatus status = TransactionStatus.PENDING;
 
-    @Column(name = "amount", nullable = false, precision = 19, scale = 2)
-    private BigDecimal amount;
+    @Column(name = "sender_amount", nullable = false, precision = 19, scale = 2)
+    private BigDecimal senderAmount;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "currency_code", nullable = false)
-    private Currency currency;
+    @JoinColumn(name = "sender_currency_code", nullable = false)
+    private Currency senderCurrency;
+
+    @Column(name = "recipient_amount", nullable = false, precision = 19, scale = 2)
+    private BigDecimal recipientAmount;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "recipient_currency_code", nullable = false)
+    private Currency recipientCurrency;
+
+    @Column(name = "exchange_rate", nullable = false, precision = 19, scale = 8)
+    private BigDecimal exchangeRate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id")

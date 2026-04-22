@@ -6,8 +6,8 @@ import com.krushkov.virtualwallet.models.dtos.requests.transaction.TransactionFi
 import com.krushkov.virtualwallet.repositories.TransactionRepository;
 import com.krushkov.virtualwallet.repositories.specifications.TransactionSpecifications;
 import com.krushkov.virtualwallet.security.auth.PrincipalContext;
-import com.krushkov.virtualwallet.services.contacts.TransactionService;
-import com.krushkov.virtualwallet.services.contacts.WalletService;
+import com.krushkov.virtualwallet.services.contracts.TransactionService;
+import com.krushkov.virtualwallet.services.contracts.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

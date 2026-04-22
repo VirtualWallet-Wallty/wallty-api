@@ -2,7 +2,6 @@ package com.krushkov.virtualwallet.services;
 
 import com.krushkov.virtualwallet.exceptions.InvalidOperationException;
 import com.krushkov.virtualwallet.helpers.ValidationMessages;
-import com.krushkov.virtualwallet.helpers.mappers.UserMapper;
 import com.krushkov.virtualwallet.models.dtos.responses.auth.UserPrincipalResponse;
 import com.krushkov.virtualwallet.security.auth.PrincipalContext;
 import com.krushkov.virtualwallet.security.auth.UserPrincipal;
@@ -10,8 +9,8 @@ import com.krushkov.virtualwallet.security.jwt.JwtCookieUtil;
 import com.krushkov.virtualwallet.security.jwt.JwtUtil;
 import com.krushkov.virtualwallet.models.User;
 import com.krushkov.virtualwallet.models.dtos.requests.auth.LoginRequest;
-import com.krushkov.virtualwallet.services.contacts.AuthService;
-import com.krushkov.virtualwallet.services.contacts.UserService;
+import com.krushkov.virtualwallet.services.contracts.AuthService;
+import com.krushkov.virtualwallet.services.contracts.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

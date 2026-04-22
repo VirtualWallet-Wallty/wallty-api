@@ -1,8 +1,6 @@
 package com.krushkov.virtualwallet.services;
 
 import com.krushkov.virtualwallet.exceptions.EntityNotFoundException;
-import com.krushkov.virtualwallet.exceptions.InvalidOperationException;
-import com.krushkov.virtualwallet.helpers.ValidationMessages;
 import com.krushkov.virtualwallet.helpers.validations.TransactionValidations;
 import com.krushkov.virtualwallet.helpers.validations.UserValidations;
 import com.krushkov.virtualwallet.helpers.validations.WalletValidations;
@@ -14,9 +12,9 @@ import com.krushkov.virtualwallet.repositories.UserRepository;
 import com.krushkov.virtualwallet.repositories.WalletRepository;
 import com.krushkov.virtualwallet.repositories.specifications.WalletSpecifications;
 import com.krushkov.virtualwallet.security.auth.PrincipalContext;
-import com.krushkov.virtualwallet.services.contacts.CurrencyService;
-import com.krushkov.virtualwallet.services.contacts.UserService;
-import com.krushkov.virtualwallet.services.contacts.WalletService;
+import com.krushkov.virtualwallet.services.contracts.CurrencyService;
+import com.krushkov.virtualwallet.services.contracts.UserService;
+import com.krushkov.virtualwallet.services.contracts.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -147,7 +145,6 @@ public class WalletServiceImpl implements WalletService {
         Wallet targetWallet = lockWallet(targetWalletId);
 
         TransactionValidations.validateAmount(amount);
-        TransactionValidations.validateSufficientFunds(targetWallet, amount);
 
         targetWallet.setBalance(targetWallet.getBalance().add(amount));
     }
@@ -162,7 +159,6 @@ public class WalletServiceImpl implements WalletService {
         Wallet targetWallet = lockWalletOwnedByUser(targetWalletId, recipientId);
 
         TransactionValidations.validateAmount(amount);
-        TransactionValidations.validateSufficientFunds(targetWallet, amount);
 
         targetWallet.setBalance(targetWallet.getBalance().add(amount));
     }
