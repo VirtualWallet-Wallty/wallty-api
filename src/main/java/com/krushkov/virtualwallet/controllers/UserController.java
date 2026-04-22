@@ -2,18 +2,16 @@ package com.krushkov.virtualwallet.controllers;
 
 import com.krushkov.virtualwallet.helpers.factories.ApiResponseFactory;
 import com.krushkov.virtualwallet.helpers.mappers.UserMapper;
-import com.krushkov.virtualwallet.models.User;
 import com.krushkov.virtualwallet.models.dtos.requests.user.UserFilterOptions;
 import com.krushkov.virtualwallet.models.dtos.requests.user.UserUpdateRequest;
 import com.krushkov.virtualwallet.models.dtos.responses.api.ApiResponse;
 import com.krushkov.virtualwallet.models.dtos.responses.user.UserLongResponse;
 import com.krushkov.virtualwallet.models.dtos.responses.user.UserShortResponse;
-import com.krushkov.virtualwallet.services.contacts.UserService;
+import com.krushkov.virtualwallet.services.contracts.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

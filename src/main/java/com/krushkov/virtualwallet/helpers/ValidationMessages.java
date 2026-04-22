@@ -66,7 +66,8 @@ public final class ValidationMessages {
     // Payment/Top-Up/Transfer request errors
     public final static String AMOUNT_LENGTH_ERROR = "Amount must be greater that zero.";
     public final static String AMOUNT_NOT_NULL_ERROR = "Amount must be not null.";
-    public final static String MERCHANT_NOT_NULL_ERROR = "Merchant reference is required.";
+    public final static String WALLET_ID_LENGTH_ERROR = "Wallet ID must be positive.";
+    public final static String WALLET_ID_NOT_NULL_ERROR = "Wallet ID is required.";
     public final static String CARD_ID_LENGTH_ERROR = "Card ID must be positive.";
     public final static String CARD_ID_NOT_NULL_ERROR = "Card ID is required.";
     public final static String RECIPIENT_ID_NOT_NULL_ERROR = "Recipient ID must be not null.";

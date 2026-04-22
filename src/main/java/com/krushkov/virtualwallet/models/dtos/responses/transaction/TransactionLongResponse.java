@@ -16,8 +16,15 @@ public record TransactionLongResponse(
         TransactionType type,
         TransactionStatus status,
 
-        BigDecimal amount,
-        CurrencyShortResponse currency,
+        BigDecimal senderAmount,
+        CurrencyShortResponse senderCurrency,
+
+        BigDecimal recipientAmount,
+        CurrencyShortResponse recipientCurrency,
+
+        BigDecimal exchangeRate,
+
+        String counterpartyName,
 
         UserShortResponse sender,
         UserShortResponse recipient,

@@ -3,20 +3,16 @@ package com.krushkov.virtualwallet.controllers;
 import com.krushkov.virtualwallet.helpers.factories.ApiResponseFactory;
 import com.krushkov.virtualwallet.helpers.mappers.CardMapper;
 import com.krushkov.virtualwallet.models.Card;
-import com.krushkov.virtualwallet.models.User;
 import com.krushkov.virtualwallet.models.dtos.requests.card.CardCreateRequest;
 import com.krushkov.virtualwallet.models.dtos.responses.api.ApiResponse;
 import com.krushkov.virtualwallet.models.dtos.responses.card.CardLongResponse;
 import com.krushkov.virtualwallet.models.dtos.responses.card.CardShortResponse;
-import com.krushkov.virtualwallet.services.contacts.CardService;
-import com.krushkov.virtualwallet.services.contacts.UserService;
+import com.krushkov.virtualwallet.services.contracts.CardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController

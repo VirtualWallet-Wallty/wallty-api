@@ -15,6 +15,8 @@ public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", ignore = true)
+    @Mapping(target = "photoUrl", ignore = true)
+    @Mapping(target = "phoneNumber", ignore = true)
     @Mapping(target = "wallets", ignore = true)
     @Mapping(target = "cards", ignore = true)
     @Mapping(target = "blocked", ignore = true)
@@ -24,7 +26,15 @@ public interface UserMapper {
     User fromRegister(RegisterRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "role", ignore = true)
     @Mapping(target = "password", ignore = true)
+    @Mapping(target = "wallets", ignore = true)
+    @Mapping(target = "cards", ignore = true)
+    @Mapping(target = "blocked", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     void update(@MappingTarget User user, UserUpdateRequest request);
 
     UserShortResponse toShort(User user);

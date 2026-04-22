@@ -5,7 +5,7 @@ import com.krushkov.virtualwallet.exceptions.EntityNotFoundException;
 import com.krushkov.virtualwallet.helpers.validations.UserValidations;
 import com.krushkov.virtualwallet.models.Currency;
 import com.krushkov.virtualwallet.repositories.CurrencyRepository;
-import com.krushkov.virtualwallet.services.contacts.CurrencyService;
+import com.krushkov.virtualwallet.services.contracts.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +23,10 @@ public class CurrencyServiceImpl implements CurrencyService {
     }
 
     @Override
-    public Currency getByCode(String code) {
-        return currencyRepository.findById(code)
-                .orElseThrow(() -> new EntityNotFoundException("Currency", "code", code));
+    public Currency getByCode(String targetCurrencyCode) {
+        String normalizedCurrencyCode = targetCurrencyCode.trim().toUpperCase();
+        return currencyRepository.findById(normalizedCurrencyCode)
+                .orElseThrow(() -> new EntityNotFoundException("Currency", "code", normalizedCurrencyCode));
     }
 
     @Override
@@ -42,19 +43,19 @@ public class CurrencyServiceImpl implements CurrencyService {
     }
 
     @Override
-    public void activate(String code) {
+    public void activate(String targetCurrencyCode) {
         UserValidations.validateIsAdmin();
 
-        Currency currency = getByCode(code);
+        Currency currency = getByCode(targetCurrencyCode);
         currency.setActive(true);
         currencyRepository.save(currency);
     }
 
     @Override
-    public void deactivate(String code) {
+    public void deactivate(String targetCurrencyCode) {
         UserValidations.validateIsAdmin();
 
-        Currency currency = getByCode(code);
+        Currency currency = getByCode(targetCurrencyCode);
         currency.setActive(false);
         currencyRepository.save(currency);
     }

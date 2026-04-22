@@ -1,70 +1,55 @@
 USE virtual_wallet;
 
 INSERT INTO roles (name)
-VALUES
-    ('USER'),
-    ('ADMIN');
+VALUES ('USER'),
+       ('ADMIN');
 
 INSERT INTO currencies (currency_code, name, symbol, decimals, is_active)
-VALUES
-    ('EUR', 'Euro', '€', 2, TRUE),
-    ('USD', 'US Dollar', '$', 2, TRUE),
-    ('BGN', 'Bulgarian Lev', 'лв', 2, FALSE);
+VALUES ('USD', 'US Dollar', '$', 2, 1),
+       ('EUR', 'Euro', '€', 2, 1),
+       ('BGN', 'Bulgarian Lev', 'лв', 2, 0),
+       ('GBP', 'British Pound', '£', 2, 1);
 
-INSERT INTO users
-(username, password_hash, first_name, last_name, email, phone_number, photo_url, role_id, is_blocked)
-VALUES
-    ('ivan',
-     '$2a$12$BTDgPqC5sEuzNweEW2ODG.R6cC1NuOJRUWCOXS9.npTJuV8INlyJ2',
-     'Ivan', 'Petrov', 'ivan@test.com', '0888000001', NULL, 1, FALSE),
+INSERT INTO users (username, password_hash, first_name, last_name, email, role_id)
+VALUES ('admin', '$2a$12$OXI1ydbzap4eYyUs5zgoyOL27Wt3Hb8XWfD908GFNStr/6GD0A4t2', 'Admin', 'Adminov', 'admin@mail.com',
+        2),
+       ('user1', '$2a$12$sXJx499qUExi3wapahjDBO8QSndygpTJFC2WP9meWFW.yNATbHp52', 'User', 'One', 'user1@mail.com', 1),
+       ('user2', '$2a$12$tlv00PfAypPzhTgHpg2uyOkHJ0iJzLIBSnBeIB/yQBa1y3/GYhbnq', 'User', 'Two', 'user2@mail.com', 1);
 
-    ('maria',
-     '$2a$12$7P.qXtipD.NGhVI6apI8BuczeJmImTTwVmH/YNBiSfii5GIwk2xtC',
-     'Maria', 'Ivanova', 'maria@test.com', '0888000002', NULL, 1, FALSE),
+INSERT INTO wallets (user_id, name, balance, currency_code, is_default)
+VALUES (2, 'User1 USD Wallet', 500.00, 'USD', TRUE),
+       (2, 'User1 EUR Wallet', 200.00, 'EUR', FALSE),
+       (3, 'User2 EUR Wallet', 1000.00, 'EUR', TRUE);
 
-    ('georgi',
-     '$2a$12$s0AaJUBrkLe9IY4Ddp2eIOTNXd7sLTLC5HE.agUOwNomM6nCOF0mO',
-     'Georgi', 'Dimitrov', 'georgi@test.com', '0888000003', NULL, 1, FALSE),
+INSERT INTO cards (user_id, card_holder, card_suffix, expiration_month, expiration_year, status)
+VALUES (2, 'USER ONE', '1234', 12, 2028, 'ACTIVE'),
+       (3, 'USER TWO', '5678', 11, 2027, 'ACTIVE');
 
-    ('admin',
-     '$2a$12$OXI1ydbzap4eYyUs5zgoyOL27Wt3Hb8XWfD908GFNStr/6GD0A4t2',
-     'Admin', 'Root', 'admin@test.com', NULL, NULL, 2, FALSE);
+INSERT INTO exchange_rates (from_currency_code, to_currency_code, rate, last_updated)
+VALUES ('EUR', 'USD', 1.10, NOW()),
+       ('USD', 'EUR', 0.91, NOW()),
+       ('EUR', 'BGN', 1.95583, NOW()),
+       ('BGN', 'EUR', 0.51, NOW());
 
-INSERT INTO wallets
-(user_id, name, balance, currency_code, is_default, version)
-VALUES
-    (1, 'Ivan Main',    300.00, 'EUR', TRUE,  0),
-    (1, 'Ivan Savings', 800.00, 'USD', FALSE, 0),
-
-    (2, 'Maria Main',   150.00, 'EUR', TRUE,  0),
-    (2, 'Maria Travel', 400.00, 'USD', FALSE, 0),
-
-    (3, 'Georgi Main',  500.00, 'BGN', TRUE,  0),
-
-    (4, 'Admin Wallet', 5000.00,'EUR', TRUE,  0);
-
-INSERT INTO cards
-(user_id, card_suffix, expiration_month, expiration_year, card_holder, status)
-VALUES
-    (1, '1111', 12, 2028, 'Ivan Petrov',   'ACTIVE'),
-    (1, '2222',  6, 2026, 'Ivan Petrov',   'USER_DEACTIVATED'),
-
-    (2, '3333', 11, 2027, 'Maria Ivanova', 'ACTIVE'),
-
-    (3, '4444',  3, 2029, 'Georgi Dimitrov','ACTIVE'),
-
-    (4, '9999',  1, 2030, 'Admin Root',    'ACTIVE');
-
-INSERT INTO transactions
-(label, type, status, amount, currency_code,
- sender_wallet_id, recipient_wallet_id,
- sender_id, recipient_id, external_reference)
-VALUES
-    (NULL, 'TOP_UP',   'CONFIRMED', 200.00, 'EUR', NULL, 1, NULL, 1, 'TOPUP-IVAN-001'),
-    (NULL, 'TOP_UP',   'CONFIRMED', 300.00, 'EUR', NULL, 3, NULL, 2, 'TOPUP-MARIA-001'),
-
-    ('For Caffe', 'TRANSFER', 'CONFIRMED', 50.00,  'EUR', 1, 3, 1, 2, 'TX-IVAN-MARIA-001'),
-    (NULL, 'TRANSFER', 'CONFIRMED', 75.00,  'EUR', 3, 5, 2, 3, 'TX-MARIA-GEORGI-001'),
-
-    ('Apple Inc.', 'PAYMENT',  'CONFIRMED', 20.00,  'BGN', 5, NULL, 3, NULL, 'PAY-GEORGI-001'),
-    ('Adobe' ,'PAYMENT',  'CONFIRMED', 100.00, 'EUR', 6, NULL, 4, NULL, 'PAY-ADMIN-001');
+INSERT INTO transactions (label, type, status,
+                          sender_amount, sender_currency_code,
+                          recipient_amount, recipient_currency_code,
+                          exchange_rate,
+                          sender_id, sender_wallet_id,
+                          recipient_id, recipient_wallet_id)
+VALUES ('Transfer user1 → user2',
+        'TRANSFER',
+        'CONFIRMED',
+        100.00, 'USD',
+        91.00, 'EUR',
+        0.91,
+        2, 1,
+        3, 3),
+       ('Top Up ⋅⋅1234',
+        'TOP_UP',
+        'CONFIRMED',
+        200.00, 'EUR',
+        200.00, 'EUR',
+        1.0,
+        NULL, NULL,
+        2, 2);

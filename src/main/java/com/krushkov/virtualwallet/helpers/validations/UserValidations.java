@@ -8,7 +8,6 @@ import com.krushkov.virtualwallet.models.User;
 import com.krushkov.virtualwallet.models.enums.RoleType;
 import com.krushkov.virtualwallet.repositories.UserRepository;
 import com.krushkov.virtualwallet.security.auth.PrincipalContext;
-import com.krushkov.virtualwallet.services.contacts.UserService;
 
 public final class UserValidations {
 

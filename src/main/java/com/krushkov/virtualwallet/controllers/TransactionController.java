@@ -3,19 +3,16 @@ package com.krushkov.virtualwallet.controllers;
 import com.krushkov.virtualwallet.helpers.factories.ApiResponseFactory;
 import com.krushkov.virtualwallet.helpers.mappers.TransactionMapper;
 import com.krushkov.virtualwallet.models.dtos.requests.transaction.TransactionFilterOptions;
-import com.krushkov.virtualwallet.models.dtos.requests.PaymentRequest;
-import com.krushkov.virtualwallet.models.dtos.requests.TransferRequest;
 import com.krushkov.virtualwallet.models.dtos.responses.api.ApiResponse;
 import com.krushkov.virtualwallet.models.dtos.responses.transaction.TransactionLongResponse;
 import com.krushkov.virtualwallet.models.dtos.responses.transaction.TransactionShortResponse;
 import com.krushkov.virtualwallet.models.enums.TransactionStatus;
 import com.krushkov.virtualwallet.models.enums.TransactionType;
-import com.krushkov.virtualwallet.services.contacts.TransactionService;
-import jakarta.validation.Valid;
+import com.krushkov.virtualwallet.security.auth.PrincipalContext;
+import com.krushkov.virtualwallet.services.contracts.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +29,9 @@ public class TransactionController {
 
     @GetMapping("/{targetTransactionId}")
     public ResponseEntity<ApiResponse<TransactionLongResponse>> getById(@PathVariable Long targetTransactionId) {
+        Long userId = PrincipalContext.getId();
         TransactionLongResponse transactionLongResponse =
-                transactionMapper.toLong(transactionService.getById(targetTransactionId));
+                transactionMapper.toLong(transactionService.getById(targetTransactionId), userId);
 
         return ApiResponseFactory.ok(transactionLongResponse);
     }
@@ -47,23 +45,33 @@ public class TransactionController {
             @RequestParam(required = false) Long recipientWalletId,
             @RequestParam(required = false) TransactionType type,
             @RequestParam(required = false) TransactionStatus status,
+            @RequestParam(required = false) String senderCurrencyCode,
+            @RequestParam(required = false) String recipientCurrencyCode,
+            @RequestParam(required = false) BigDecimal minSenderAmount,
+            @RequestParam(required = false) BigDecimal maxSenderAmount,
+            @RequestParam(required = false) BigDecimal minRecipientAmount,
+            @RequestParam(required = false) BigDecimal maxRecipientAmount,
+            @RequestParam(required = false) String externalReference,
             @RequestParam(required = false) LocalDateTime createdFrom,
             @RequestParam(required = false) LocalDateTime createdTo,
-            @RequestParam(required = false) BigDecimal minAmount,
-            @RequestParam(required = false) BigDecimal maxAmount,
             Pageable pageable
     ) {
+        Long userId = PrincipalContext.getId();
         TransactionFilterOptions filters = new TransactionFilterOptions(
                 label,
                 senderId, recipientId,
                 senderWalletId, recipientWalletId,
                 type, status,
-                createdFrom, createdTo,
-                minAmount, maxAmount
+                senderCurrencyCode, recipientCurrencyCode,
+                minSenderAmount, maxSenderAmount,
+                minRecipientAmount, maxRecipientAmount,
+                externalReference,
+                createdFrom, createdTo
+
         );
 
         Page<TransactionShortResponse> transactionShortResponsePage = transactionService.search(filters, pageable)
-                .map(transactionMapper::toShort);
+                .map(tx -> transactionMapper.toShort(tx, userId));
 
         return ApiResponseFactory.ok(transactionShortResponsePage);
     }
