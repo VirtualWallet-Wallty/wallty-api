@@ -24,7 +24,7 @@ public record TransactionLongResponse(
 
         BigDecimal exchangeRate,
 
-        String counterpartyName,
+        String direction,
 
         UserShortResponse sender,
         UserShortResponse recipient,
