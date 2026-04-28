@@ -1,10 +1,6 @@
 package com.krushkov.virtualwallet.models.dtos.responses.user;
 
-import com.krushkov.virtualwallet.models.dtos.responses.card.CardShortResponse;
-import com.krushkov.virtualwallet.models.dtos.responses.wallet.WalletShortResponse;
-
 import java.time.LocalDateTime;
-import java.util.List;
 
 public record UserLongResponse(
         Long id,
@@ -22,8 +18,5 @@ public record UserLongResponse(
         Boolean isBlocked,
 
         LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-
-        List<WalletShortResponse> wallets,
-        List<CardShortResponse> cards
+        LocalDateTime updatedAt
 ) {}

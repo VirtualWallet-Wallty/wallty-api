@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 public record WalletCreateRequest(
 
         @NotBlank(message = ValidationMessages.WALLET_NAME_NOT_NULL_ERROR)
-        @Size(min = 3, max = 50, message = ValidationMessages.WALLET_NAME_LENGTH_ERROR)
+        @Size(min = 3, max = 16, message = ValidationMessages.WALLET_NAME_LENGTH_ERROR)
         String name,
 
         @NotBlank(message = ValidationMessages.CURRENCY_CODE_NOT_NULL_ERROR)

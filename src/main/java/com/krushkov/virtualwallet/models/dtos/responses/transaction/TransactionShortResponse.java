@@ -19,7 +19,10 @@ public record TransactionShortResponse(
         BigDecimal recipientAmount,
         String recipientCurrencyCode,
 
-        String counterpartyName,
+        String direction,
+
+        Long senderWalletId,
+        Long recipientWalletId,
 
         LocalDateTime createdAt
 ) {}

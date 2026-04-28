@@ -15,43 +15,39 @@ public interface TransactionMapper {
 
     @Mapping(target = "senderCurrencyCode", source = "transaction.senderCurrency.code")
     @Mapping(target = "recipientCurrencyCode", source = "transaction.recipientCurrency.code")
-    @Mapping(target = "counterpartyName", expression = "java(resolveCounterpartyName(transaction, currentUserId))")
+    @Mapping(target = "senderWalletId", source = "transaction.senderWallet.id")
+    @Mapping(target = "recipientWalletId", source = "transaction.recipientWallet.id")
+    @Mapping(target = "direction", expression = "java(resolveDirection(transaction, currq   1entUserId))")
     TransactionShortResponse toShort(Transaction transaction, Long currentUserId);
 
-    @Mapping(target = "counterpartyName", expression = "java(resolveCounterpartyName(transaction, currentUserId))")
+    @Mapping(target = "direction", expression = "java(resolveDirection(transaction, currentUserId))")
     TransactionLongResponse toLong(Transaction transaction, Long currentUserId);
 
-    default String resolveCounterpartyName(Transaction tx, Long currentUserId) {
-        if (tx.getType() == TransactionType.PAYMENT) {
-            return "MERCHANT";
-        }
-        if (tx.getType() == TransactionType.TOP_UP) {
-            return "EXTERNAL";
-        }
+    default String resolveDirection(Transaction tx, Long currentUserId) {
 
-        if (tx.getType() == TransactionType.TRANSFER) {
+        Long senderId = tx.getSenderWallet() != null && tx.getSenderWallet().getUser() != null
+                ? tx.getSenderWallet().getUser().getId()
+                : null;
+
+        Long recipientId = tx.getRecipientWallet() != null && tx.getRecipientWallet().getUser() != null
+                ? tx.getRecipientWallet().getUser().getId()
+                : null;
+
+        boolean isSender = currentUserId.equals(senderId);
+        boolean isRecipient = currentUserId.equals(recipientId);
+
+        if (isSender && isRecipient) {
             return "INTERNAL";
         }
 
-            boolean isSender = tx.getSender() != null && tx.getSender().getId().equals(currentUserId);
-
         if (isSender) {
-            if (tx.getRecipient() != null) {
-                return tx.getRecipient().getUsername();
-            }
-
-            if (tx.getRecipientWallet() != null) {
-                return tx.getRecipientWallet().getName();
-            }
-        } else {
-            if (tx.getSender() != null) {
-                return tx.getSender().getUsername();
-            }
-
-            if (tx.getSenderWallet() != null) {
-                return tx.getSenderWallet().getName();
-            }
+            return "OUTGOING";
         }
+
+        if (isRecipient) {
+            return "INCOMING";
+        }
+
         return "UNKNOWN";
     }
 }

@@ -6,6 +6,14 @@ Developing a secure web application for digital wallet management, enabling seam
 
 # Latest updates:
 ```
+Log #11:
+- Removed the list of wallets and cards from UserLongResponse, due to security reasons.
+
+- Added an identifier to ExchangeRateRespone.
+
+- Changed the counterparty property to a direction that indicates whether the money was received or sent.
+```
+```
 Log #10:
 - Update the whole money flow & currency movement.
 

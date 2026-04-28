@@ -49,7 +49,7 @@ CREATE TABLE wallets
     wallet_id     BIGINT         NOT NULL UNIQUE PRIMARY KEY AUTO_INCREMENT,
     user_id       BIGINT         NOT NULL,
 
-    name          VARCHAR(50)    NOT NULL,
+    name          VARCHAR(16)    NOT NULL,
     balance       DECIMAL(19, 2) NOT NULL DEFAULT 0.00,
     currency_code VARCHAR(3)     NOT NULL,
 
